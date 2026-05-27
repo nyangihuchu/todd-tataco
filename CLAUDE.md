@@ -2,6 +2,10 @@
 
 이 파일은 이 저장소에서 작업하는 Claude Code (claude.ai/code)에게 제공되는 가이드입니다.
 
+## 프로젝트 개요
+
+Next.js 15와 Supabase를 사용한 풀스택 웹 애플리케이션 스타터 킷입니다. App Router, Server Components, 그리고 Supabase Auth를 활용한 인증 시스템을 포함하고 있습니다.
+
 ## 명령어
 
 ```bash
@@ -14,18 +18,21 @@ npm run lint     # ESLint 실행
 
 ## 아키텍처
 
-**스택:** Next.js 15 (App Router) + Supabase + Tailwind CSS + shadcn/ui (new-york 스타일)
+**스택:** Next.js 최신 버전 (App Router) + Supabase + Tailwind CSS + shadcn/ui (new-york 스타일)
 
 **필수 환경 변수:**
+
 ```
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 ```
+
 `lib/utils.ts:hasEnvVars`는 환경 변수가 없을 때 튜토리얼 UI를 숨기는 용도로, 온보딩을 위한 임시 처리입니다.
 
 ### Supabase 클라이언트 패턴
 
 두 개의 별도 클라이언트를 상황에 맞게 사용해야 합니다:
+
 - **서버** (`lib/supabase/server.ts`): `next/headers` 쿠키를 사용하는 async `createClient()` — Server Component, Route Handler, Server Action에서 사용. Fluid compute 제약으로 인해 전역 변수에 저장하지 않도록 주의.
 - **클라이언트** (`lib/supabase/client.ts`): `createBrowserClient`를 통한 sync `createClient()` — `"use client"` 컴포넌트에서 사용.
 
@@ -34,6 +41,7 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 세션 관리는 `proxy.ts`(Next.js 미들웨어 역할)를 통해 이루어지며, 내부적으로 `lib/supabase/proxy.ts:updateSession`을 호출합니다. 모든 요청마다 클라이언트 생성 직후 `supabase.auth.getClaims()`를 호출하여 세션을 갱신합니다. `createServerClient`와 `getClaims()` 사이에 코드를 추가하면 사용자가 무작위로 로그아웃될 수 있으니 주의하세요.
 
 인증 라우트는 `app/auth/` 아래에 있습니다:
+
 - `/auth/login` → `LoginForm` 클라이언트 컴포넌트
 - `/auth/sign-up` → `SignUpForm` 클라이언트 컴포넌트
 - `/auth/forgot-password` / `/auth/update-password` — 비밀번호 재설정 플로우

@@ -1,0 +1,11 @@
+.next/
+out/
+build/
+node_modules/
+next-env.d.ts
+*.tsbuildinfo
+lib/supabase/database.types.ts
+.env
+.env.*
+.claude/
+.mcp.json
