@@ -1,0 +1,50 @@
+{
+  "mcpServers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=gukxkqmeeyzoiubvigua"
+    },
+    "playwright": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--headless",
+        "--output-dir",
+        "C:\\Users\\cjl22\\.playwright-mcp"
+      ],
+      "env": {}
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "ctx7sk-9ceefb0c-0d41-4ac6-a5e7-8e33774e943a"
+      }
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": [
+        "shadcn@latest",
+        "mcp"
+      ]
+    },
+    "shrimp-task-manager": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-shrimp-task-manager"
+      ],
+      "env": {
+        "DATA_DIR": "C:\\superfix\\start-kit\\base-supabase-app\\shrimp-data"
+      }
+    }
+  }
+}
