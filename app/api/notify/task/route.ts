@@ -26,9 +26,10 @@ export async function POST(request: Request) {
 
   const { taskId } = parsed.data
 
+  // profiles가 assignee_id, created_by 두 컬럼으로 참조되므로 컬럼명 힌트 필요
   const { data: task, error } = await supabase
     .from('tasks')
-    .select('id, title, status, due_date, memo, assignee_id, companies(id, name, contact_name, phone), profiles(display_name)')
+    .select('id, title, status, due_date, memo, assignee_id, companies(id, name, contact_name, phone), profiles!tasks_assignee_id_fkey(display_name)')
     .eq('id', taskId)
     .single()
 
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: '업체 전화번호 미등록' }, { status: 422 })
   }
 
-  const assignee = task.profiles as { display_name: string | null } | null
+  const assignee = task.profiles as unknown as { display_name: string | null } | null
   const dueDateLabel = task.due_date
     ? new Date(task.due_date).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric' })
     : '미정'
