@@ -43,7 +43,7 @@
         "mcp-shrimp-task-manager"
       ],
       "env": {
-        "DATA_DIR": "C:\\superfix\\start-kit\\base-supabase-app\\shrimp-data"
+        "DATA_DIR": "E:\\cjl2211\\superfix\\todo-tataco\\shrimp-data"
       }
     }
   }
