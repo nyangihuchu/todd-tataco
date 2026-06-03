@@ -14,6 +14,178 @@ export type Database = {
   }
   public: {
     Tables: {
+      companies: {
+        Row: {
+          id: string
+          name: string
+          contact_name: string | null
+          phone: string | null
+          email: string | null
+          memo: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          contact_name?: string | null
+          phone?: string | null
+          email?: string | null
+          memo?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          contact_name?: string | null
+          phone?: string | null
+          email?: string | null
+          memo?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'companies_created_by_fkey'
+            columns: ['created_by']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      tasks: {
+        Row: {
+          id: string
+          title: string
+          company_id: string | null
+          assignee_id: string | null
+          status: 'pending' | 'in_progress' | 'review' | 'done'
+          priority: 'high' | 'medium' | 'low'
+          start_date: string | null
+          due_date: string | null
+          memo: string | null
+          created_by: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          title: string
+          company_id?: string | null
+          assignee_id?: string | null
+          status?: 'pending' | 'in_progress' | 'review' | 'done'
+          priority?: 'high' | 'medium' | 'low'
+          start_date?: string | null
+          due_date?: string | null
+          memo?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          title?: string
+          company_id?: string | null
+          assignee_id?: string | null
+          status?: 'pending' | 'in_progress' | 'review' | 'done'
+          priority?: 'high' | 'medium' | 'low'
+          start_date?: string | null
+          due_date?: string | null
+          memo?: string | null
+          created_by?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'tasks_company_id_fkey'
+            columns: ['company_id']
+            isOneToOne: false
+            referencedRelation: 'companies'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'tasks_assignee_id_fkey'
+            columns: ['assignee_id']
+            isOneToOne: false
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      comments: {
+        Row: {
+          id: string
+          task_id: string
+          author_id: string | null
+          content: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          task_id: string
+          author_id?: string | null
+          content: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          task_id?: string
+          author_id?: string | null
+          content?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'comments_task_id_fkey'
+            columns: ['task_id']
+            isOneToOne: false
+            referencedRelation: 'tasks'
+            referencedColumns: ['id']
+          }
+        ]
+      }
+      notification_logs: {
+        Row: {
+          id: string
+          type: 'daily' | 'task_created'
+          company_id: string | null
+          task_id: string | null
+          phone: string
+          status: 'sent' | 'failed'
+          error_msg: string | null
+          sent_at: string
+        }
+        Insert: {
+          id?: string
+          type: 'daily' | 'task_created'
+          company_id?: string | null
+          task_id?: string | null
+          phone: string
+          status: 'sent' | 'failed'
+          error_msg?: string | null
+          sent_at?: string
+        }
+        Update: {
+          id?: string
+          type?: 'daily' | 'task_created'
+          company_id?: string | null
+          task_id?: string | null
+          phone?: string
+          status?: 'sent' | 'failed'
+          error_msg?: string | null
+          sent_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
