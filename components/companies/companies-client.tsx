@@ -12,9 +12,10 @@ import type { Tables } from '@/lib/supabase/database.types'
 
 interface CompaniesClientProps {
   initialCompanies: Tables<'companies'>[]
+  currentUserId: string
 }
 
-export function CompaniesClient({ initialCompanies }: CompaniesClientProps) {
+export function CompaniesClient({ initialCompanies, currentUserId }: CompaniesClientProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
@@ -74,6 +75,7 @@ export function CompaniesClient({ initialCompanies }: CompaniesClientProps) {
             <CompanyCard
               key={company.id}
               company={company}
+              isOwner={company.user_id === currentUserId}
               onEdit={openEdit}
               onDelete={handleDeleted}
             />

@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import type { TaskWithCompany } from '@/lib/actions/tasks'
+import type { Tables } from '@/lib/supabase/database.types'
 
 const DAYS_OF_WEEK = ['일', '월', '화', '수', '목', '금', '토']
 
@@ -20,6 +21,12 @@ const priorityDotColor: Record<TaskPriority, string> = {
   low: 'bg-slate-400',
 }
 
+const priorityBadgeClass: Record<TaskPriority, string> = {
+  high: 'border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-400',
+  medium: 'border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400',
+  low: 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400',
+}
+
 const priorityLabel: Record<TaskPriority, string> = {
   high: '높음',
   medium: '보통',
@@ -31,6 +38,13 @@ const statusLabel: Record<TaskStatus, string> = {
   in_progress: '진행중',
   review: '확인요청',
   done: '완료',
+}
+
+const statusBadgeClass: Record<TaskStatus, string> = {
+  pending: 'border-slate-200 bg-slate-50 text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400',
+  in_progress: 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-400',
+  review: 'border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400',
+  done: 'border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950 dark:text-emerald-400',
 }
 
 // priority/status 문자열을 리터럴 타입으로 안전하게 좁히는 헬퍼
@@ -47,16 +61,23 @@ function getStatusLabel(status: string): string {
 }
 
 interface MonthlyCalendarProps {
-  // 서버에서 조회한 업무 목록 (기본값 빈 배열)
   tasks?: TaskWithCompany[]
+  companies?: Tables<'companies'>[]
 }
 
-export function MonthlyCalendar({ tasks = [] }: MonthlyCalendarProps) {
+export function MonthlyCalendar({ tasks = [], companies = [] }: MonthlyCalendarProps) {
   const now = new Date()
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth())
+  const [selectedCompanyIds, setSelectedCompanyIds] = useState<string[]>([])
 
-  const today = now.toISOString().split('T')[0]
+  function toggleCompany(id: string) {
+    setSelectedCompanyIds((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
+    )
+  }
+
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
   const calendarDays = useMemo(() => {
     const firstDayOfWeek = new Date(year, month, 1).getDay()
@@ -67,10 +88,16 @@ export function MonthlyCalendar({ tasks = [] }: MonthlyCalendarProps) {
     return days
   }, [year, month])
 
-  // 특정 날짜의 마감 업무 필터링
+  // 특정 날짜의 마감 업무 필터링 (업체 다중 선택 필터 적용)
   function getTasksForDay(day: number): TaskWithCompany[] {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    return tasks.filter((t) => t.due_date === dateStr)
+    return tasks.filter((t) => {
+      const matchDate = t.due_date?.startsWith(dateStr)
+      const matchCompany =
+        selectedCompanyIds.length === 0 ||
+        (t.company_id != null && selectedCompanyIds.includes(t.company_id))
+      return matchDate && matchCompany
+    })
   }
 
   function prevMonth() {
@@ -97,6 +124,29 @@ export function MonthlyCalendar({ tasks = [] }: MonthlyCalendarProps) {
           <ChevronRight size={18} />
         </Button>
       </div>
+
+      {/* 업체 필터 — 업체가 있을 때만 표시 */}
+      {companies.length > 0 && (
+        <div className='flex flex-wrap gap-2'>
+          <Button
+            variant={selectedCompanyIds.length === 0 ? 'default' : 'outline'}
+            size='sm'
+            onClick={() => setSelectedCompanyIds([])}
+          >
+            전체
+          </Button>
+          {companies.map((company) => (
+            <Button
+              key={company.id}
+              variant={selectedCompanyIds.includes(company.id) ? 'default' : 'outline'}
+              size='sm'
+              onClick={() => toggleCompany(company.id)}
+            >
+              {company.name}
+            </Button>
+          ))}
+        </div>
+      )}
 
       {/* 요일 헤더 */}
       <div className='grid grid-cols-7 text-center'>
@@ -174,10 +224,24 @@ export function MonthlyCalendar({ tasks = [] }: MonthlyCalendarProps) {
                         <p className='text-sm font-medium'>{task.title}</p>
                         <p className='text-xs text-muted-foreground'>{task.company_name}</p>
                         <div className='flex gap-1'>
-                          <Badge variant='outline' className='text-xs'>
+                          <Badge
+                            variant='outline'
+                            className={cn(
+                              'text-xs',
+                              priorityBadgeClass[task.priority as TaskPriority] ??
+                                priorityBadgeClass.low,
+                            )}
+                          >
                             {getPriorityLabel(task.priority)}
                           </Badge>
-                          <Badge variant='secondary' className='text-xs'>
+                          <Badge
+                            variant='outline'
+                            className={cn(
+                              'text-xs',
+                              statusBadgeClass[task.status as TaskStatus] ??
+                                statusBadgeClass.pending,
+                            )}
+                          >
                             {getStatusLabel(task.status)}
                           </Badge>
                         </div>

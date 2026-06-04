@@ -17,13 +17,12 @@ import { cn } from '@/lib/utils'
 import { deleteTask } from '@/lib/actions/tasks'
 import type { TaskWithCompany } from '@/lib/actions/tasks'
 
-// 우선순위별 Badge variant 매핑
 type Priority = 'high' | 'medium' | 'low'
 
-const priorityVariant: Record<Priority, 'destructive' | 'secondary' | 'outline'> = {
-  high: 'destructive',
-  medium: 'secondary',
-  low: 'outline',
+const priorityClass: Record<Priority, string> = {
+  high: 'border-rose-200 bg-rose-50 text-rose-600 dark:border-rose-800 dark:bg-rose-950 dark:text-rose-400',
+  medium: 'border-amber-200 bg-amber-50 text-amber-600 dark:border-amber-800 dark:bg-amber-950 dark:text-amber-400',
+  low: 'border-slate-200 bg-slate-50 text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400',
 }
 
 const priorityLabel: Record<Priority, string> = {
@@ -120,7 +119,7 @@ export function TaskCardContent({
           {/* 컬럼 너비가 줄어들어도 제목이 잘리도록 truncate 처리 */}
           <p className='min-w-0 flex-1 truncate text-sm font-medium leading-snug'>{task.title}</p>
           <div className='flex shrink-0 items-center gap-1'>
-            <Badge variant={priorityVariant[priority]} className='text-xs'>
+            <Badge variant='outline' className={cn('text-xs', priorityClass[priority])}>
               {priorityLabel[priority]}
             </Badge>
             {onEdit && (

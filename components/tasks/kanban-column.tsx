@@ -11,31 +11,44 @@ import type { TaskWithCompany } from '@/lib/actions/tasks'
 // tasks 테이블 status 컬럼의 실제 값 + 지연(overdue) 가상 상태
 type Status = 'pending' | 'in_progress' | 'review' | 'done' | 'overdue'
 
-const columnConfig: Record<Status, { label: string; colorClass: string; overClass: string }> = {
-  pending: {
-    label: '대기',
-    colorClass: 'bg-slate-100 dark:bg-slate-800',
-    overClass: 'ring-2 ring-slate-400',
-  },
-  in_progress: {
-    label: '진행중',
-    colorClass: 'bg-blue-50 dark:bg-blue-950',
-    overClass: 'ring-2 ring-blue-400',
-  },
-  review: {
-    label: '확인요청',
-    colorClass: 'bg-yellow-50 dark:bg-yellow-950',
-    overClass: 'ring-2 ring-yellow-400',
-  },
-  done: {
-    label: '완료',
-    colorClass: 'bg-green-50 dark:bg-green-950',
-    overClass: 'ring-2 ring-green-400',
-  },
+const columnConfig: Record<
+  Status,
+  { label: string; colorClass: string; overClass: string; dotClass: string; labelClass: string }
+> = {
   overdue: {
     label: '지연',
     colorClass: 'bg-rose-50 dark:bg-rose-950',
     overClass: '',
+    dotClass: 'bg-rose-500',
+    labelClass: 'text-rose-700 dark:text-rose-400',
+  },
+  pending: {
+    label: '대기',
+    colorClass: 'bg-slate-50 dark:bg-slate-800',
+    overClass: 'ring-2 ring-slate-300',
+    dotClass: 'bg-slate-400',
+    labelClass: 'text-slate-600 dark:text-slate-400',
+  },
+  in_progress: {
+    label: '진행중',
+    colorClass: 'bg-blue-50 dark:bg-blue-950',
+    overClass: 'ring-2 ring-blue-300',
+    dotClass: 'bg-blue-500',
+    labelClass: 'text-blue-700 dark:text-blue-400',
+  },
+  review: {
+    label: '확인요청',
+    colorClass: 'bg-amber-50 dark:bg-amber-950',
+    overClass: 'ring-2 ring-amber-300',
+    dotClass: 'bg-amber-500',
+    labelClass: 'text-amber-700 dark:text-amber-400',
+  },
+  done: {
+    label: '완료',
+    colorClass: 'bg-emerald-50 dark:bg-emerald-950',
+    overClass: 'ring-2 ring-emerald-300',
+    dotClass: 'bg-emerald-500',
+    labelClass: 'text-emerald-700 dark:text-emerald-400',
   },
 }
 
@@ -57,7 +70,7 @@ export function KanbanColumn({
   activeTaskId,
 }: KanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id: status })
-  const { label, colorClass, overClass } = columnConfig[status]
+  const { label, colorClass, overClass, dotClass, labelClass } = columnConfig[status]
 
   return (
     <div
@@ -70,7 +83,8 @@ export function KanbanColumn({
       )}
     >
       <div className='mb-3 flex items-center gap-2'>
-        <h3 className='text-sm font-semibold'>{label}</h3>
+        <span className={cn('h-2 w-2 shrink-0 rounded-full', dotClass)} />
+        <h3 className={cn('text-sm font-semibold', labelClass)}>{label}</h3>
         <Badge variant='secondary' className='text-xs'>
           {tasks.length}
         </Badge>
