@@ -18,19 +18,30 @@ export default function DashboardLayout({
 
 async function AuthenticatedLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
-  const { data, error } = await supabase.auth.getClaims()
+  const { data: { user }, error } = await supabase.auth.getUser()
 
-  if (error || !data?.claims) {
+  if (error || !user) {
     redirect('/auth/login')
   }
 
-  const userEmail = (data.claims.email as string) ?? ''
+  const userEmail = user.email ?? ''
+  const uid = user.id
 
-  // 현재 사용자의 표시 이름 조회
+  const { data: company } = await supabase
+    .from('companies')
+    .select('contact_name')
+    .or(`user_id.eq.${uid},created_by.eq.${uid}`)
+    .limit(1)
+    .maybeSingle()
+
+  if (!company?.contact_name) {
+    redirect('/onboarding')
+  }
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('display_name')
-    .eq('id', data.claims.sub as string)
+    .eq('id', uid)
     .single()
 
   const displayName = profile?.display_name ?? null
