@@ -22,7 +22,7 @@ npm run type-check   # TypeScript 타입 검사 (빌드 없이)
 
 ## 환경 변수
 
-`.env.local.example`을 복사해 `.env.local`로 사용하세요.
+`.env.local`에 아래 변수를 설정하세요.
 
 ```
 # Supabase
