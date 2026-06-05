@@ -11,6 +11,8 @@ async function HomeContent() {
   } else {
     redirect('/auth/login')
   }
+
+  return null
 }
 
 export default function Home() {

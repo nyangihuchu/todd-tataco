@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useTransition } from 'react'
-import { useForm, Controller } from 'react-hook-form'
+import { useForm, Controller, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
@@ -22,7 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { Checkbox } from '@/components/ui/checkbox'
 import { createTask, updateTask } from '@/lib/actions/tasks'
+import { sendTaskNotification } from '@/lib/actions/notifications'
 import type { TaskWithCompany } from '@/lib/actions/tasks'
 import type { Tables } from '@/lib/supabase/database.types'
 
@@ -46,6 +48,7 @@ const schema = z.object({
   start_date: z.string().optional(),
   due_date: z.string().optional(),
   memo: z.string().optional(),
+  send_notification: z.boolean(),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -101,8 +104,13 @@ export function TaskFormModal({
       start_date: '',
       due_date: '',
       memo: '',
+      send_notification: false,
     },
   })
+
+  const watchedCompanyId = useWatch({ control, name: 'company_id' })
+  const selectedCompany = companies.find((c) => c.id === watchedCompanyId)
+  const hasPhone = !!selectedCompany?.phone
 
   // Sheet가 열릴 때마다 폼 초기화
   useEffect(() => {
@@ -122,6 +130,7 @@ export function TaskFormModal({
         start_date: toDatetimeLocal(defaultValues?.start_date),
         due_date: toDatetimeLocal(defaultValues?.due_date),
         memo: defaultValues?.memo ?? '',
+        send_notification: false,
       })
     }
   }, [open, defaultValues, reset])
@@ -147,6 +156,13 @@ export function TaskFormModal({
         if (result.error) {
           toast.error(`등록 실패: ${result.error}`)
           return
+        }
+
+        if (data.send_notification && result.data?.id) {
+          const notifResult = await sendTaskNotification(result.data.id)
+          if (!notifResult.success) {
+            toast.warning('업무는 등록되었으나 알림 발송에 실패했습니다')
+          }
         }
 
         toast.success('업무가 등록되었습니다')
@@ -299,6 +315,35 @@ export function TaskFormModal({
               <Label htmlFor='memo'>메모</Label>
               <Input id='memo' {...register('memo')} placeholder='메모 입력' />
             </div>
+
+            {/* 알림 발송 — create 모드에서만 표시 */}
+            {mode === 'create' && (
+              <div className='flex flex-col gap-1'>
+                <div className='flex items-center gap-2'>
+                  <Controller
+                    name='send_notification'
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id='send_notification'
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        disabled={!hasPhone}
+                      />
+                    )}
+                  />
+                  <Label
+                    htmlFor='send_notification'
+                    className={!hasPhone ? 'cursor-default text-muted-foreground' : 'cursor-pointer'}
+                  >
+                    업체에 알림 발송
+                  </Label>
+                </div>
+                {watchedCompanyId && !hasPhone && (
+                  <p className='text-xs text-muted-foreground'>전화번호가 등록되지 않은 업체입니다</p>
+                )}
+              </div>
+            )}
           </div>
 
           {/* 하단 버튼 영역 */}
