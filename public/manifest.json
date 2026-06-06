@@ -1,0 +1,24 @@
+{
+  "name": "TATACO — 업체 협업 업무관리",
+  "short_name": "TATACO",
+  "description": "외부 업체와의 업무를 한곳에서 관리하고, 카카오 알림톡으로 놓치지 마세요.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#18181b",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

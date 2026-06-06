@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
@@ -12,6 +12,19 @@ export const metadata: Metadata = {
   metadataBase: new URL(defaultUrl),
   title: 'TATACO — 업체 협업 업무관리',
   description: '외부 업체와의 업무를 한곳에서 관리하고, 카카오 알림톡으로 놓치지 마세요.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'TATACO',
+  },
+}
+
+export const viewport: Viewport = {
+  themeColor: '#18181b',
+  width: 'device-width',
+  initialScale: 1,
+  minimumScale: 1,
 }
 
 const geistSans = Geist({
