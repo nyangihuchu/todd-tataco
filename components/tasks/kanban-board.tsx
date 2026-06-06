@@ -57,7 +57,11 @@ export function KanbanBoard({ tasks, onEditTask }: KanbanBoardProps) {
   function handleCommentAdded() {
     if (!selectedTask) return
     getComments(selectedTask.id).then((r) => {
-      if (r.data) setComments(r.data)
+      if (r.error) {
+        toast.error(`댓글 로드 실패: ${r.error}`)
+        return
+      }
+      setComments(r.data ?? [])
     })
   }
 

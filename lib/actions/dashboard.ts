@@ -28,10 +28,7 @@ type CommentWithRelations = {
   content: string
   created_at: string
   task_id: string
-  profiles: {
-    display_name: string | null
-    companies: { name: string }[] | null
-  } | null
+  profiles: { display_name: string | null } | null
   tasks: { title: string | null } | null
 }
 
@@ -76,7 +73,7 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
       // 최근 댓글 5개 (작성자 프로필, 업무 제목 JOIN)
       supabase
         .from('comments')
-        .select('id, content, created_at, task_id, profiles(display_name, companies(name)), tasks(title)')
+        .select('id, content, created_at, task_id, profiles(display_name), tasks(title)')
         .order('created_at', { ascending: false })
         .limit(5),
     ])
@@ -106,9 +103,7 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
     content: c.content,
     created_at: c.created_at,
     task_id: c.task_id,
-    author_name: (Array.isArray(c.profiles?.companies) && c.profiles.companies.length > 0
-      ? c.profiles.companies[0].name
-      : null) ?? c.profiles?.display_name ?? null,
+    author_name: c.profiles?.display_name ?? null,
     task_title: c.tasks?.title ?? null,
   }))
 
