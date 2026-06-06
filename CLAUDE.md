@@ -30,7 +30,7 @@ NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
 
 # 서비스 URL (알림 메시지 내 링크)
-NEXT_PUBLIC_SITE_URL=https://tataco.vercel.app
+NEXT_PUBLIC_SITE_URL=https://todd-tataco.vercel.app
 
 # Solapi (카카오 알림톡)
 SOLAPI_API_KEY=
