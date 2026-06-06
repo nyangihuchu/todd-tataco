@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
 import { createTask, updateTask } from '@/lib/actions/tasks'
-import { sendTaskNotification } from '@/lib/actions/notifications'
+import { sendTaskNotification, scheduleTaskNotification } from '@/lib/actions/notifications'
 import type { TaskWithCompany } from '@/lib/actions/tasks'
 import type { Tables } from '@/lib/supabase/database.types'
 
@@ -49,6 +49,8 @@ const schema = z.object({
   due_date: z.string().optional(),
   memo: z.string().optional(),
   send_notification: z.boolean(),
+  notification_type: z.enum(['immediate', 'scheduled']).optional(),
+  notification_scheduled_at: z.string().optional(),
 })
 
 type FormValues = z.infer<typeof schema>
@@ -105,10 +107,14 @@ export function TaskFormModal({
       due_date: '',
       memo: '',
       send_notification: false,
+      notification_type: 'immediate',
+      notification_scheduled_at: '',
     },
   })
 
   const watchedCompanyId = useWatch({ control, name: 'company_id' })
+  const watchedSendNotification = useWatch({ control, name: 'send_notification' })
+  const watchedNotificationType = useWatch({ control, name: 'notification_type' })
   const selectedCompany = companies.find((c) => c.id === watchedCompanyId)
   const hasPhone = !!selectedCompany?.phone
 
@@ -131,6 +137,8 @@ export function TaskFormModal({
         due_date: toDatetimeLocal(defaultValues?.due_date),
         memo: defaultValues?.memo ?? '',
         send_notification: false,
+        notification_type: 'immediate',
+        notification_scheduled_at: '',
       })
     }
   }, [open, defaultValues, reset])
@@ -159,9 +167,18 @@ export function TaskFormModal({
         }
 
         if (data.send_notification && result.data?.id) {
-          const notifResult = await sendTaskNotification(result.data.id)
-          if (!notifResult.success) {
-            toast.warning('업무는 등록되었으나 알림 발송에 실패했습니다')
+          if (data.notification_type === 'scheduled' && data.notification_scheduled_at) {
+            const schedResult = await scheduleTaskNotification(result.data.id, data.notification_scheduled_at)
+            if (schedResult.error) {
+              toast.warning(`업무는 등록되었으나 알림 예약에 실패했습니다: ${schedResult.error}`)
+            } else {
+              toast.info('알림이 예약되었습니다')
+            }
+          } else {
+            const notifResult = await sendTaskNotification(result.data.id)
+            if (!notifResult.success) {
+              toast.warning('업무는 등록되었으나 알림 발송에 실패했습니다')
+            }
           }
         }
 
@@ -318,7 +335,7 @@ export function TaskFormModal({
 
             {/* 알림 발송 — create 모드에서만 표시 */}
             {mode === 'create' && (
-              <div className='flex flex-col gap-1'>
+              <div className='flex flex-col gap-2'>
                 <div className='flex items-center gap-2'>
                   <Controller
                     name='send_notification'
@@ -339,6 +356,52 @@ export function TaskFormModal({
                     업체에 알림 발송
                   </Label>
                 </div>
+
+                {/* 발송 시간 선택 — 알림 ON + 전화번호 있을 때만 표시 */}
+                {watchedSendNotification && hasPhone && (
+                  <div className='ml-6 flex flex-col gap-2 rounded-md border p-3'>
+                    <Controller
+                      name='notification_type'
+                      control={control}
+                      render={({ field }) => (
+                        <div className='flex flex-col gap-2'>
+                          <label className='flex cursor-pointer items-center gap-2 text-sm'>
+                            <input
+                              type='radio'
+                              value='immediate'
+                              checked={field.value === 'immediate'}
+                              onChange={() => field.onChange('immediate')}
+                              className='accent-primary'
+                            />
+                            즉시 발송
+                          </label>
+                          <label className='flex cursor-pointer items-center gap-2 text-sm'>
+                            <input
+                              type='radio'
+                              value='scheduled'
+                              checked={field.value === 'scheduled'}
+                              onChange={() => field.onChange('scheduled')}
+                              className='accent-primary'
+                            />
+                            예약 발송
+                          </label>
+                        </div>
+                      )}
+                    />
+                    {watchedNotificationType === 'scheduled' && (
+                      <div className='flex flex-col gap-1'>
+                        <Input
+                          type='datetime-local'
+                          min={new Date(Date.now() + 60000).toISOString().slice(0, 16)}
+                          {...register('notification_scheduled_at')}
+                          className='cursor-pointer text-sm'
+                        />
+                        <p className='text-xs text-muted-foreground'>현재 시각 이후로 설정해 주세요</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {watchedCompanyId && !hasPhone && (
                   <p className='text-xs text-muted-foreground'>전화번호가 등록되지 않은 업체입니다</p>
                 )}
