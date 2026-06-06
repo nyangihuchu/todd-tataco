@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 import {
   Select,
@@ -346,7 +347,13 @@ export function TaskFormModal({
             {/* 메모 */}
             <div className='flex flex-col gap-1'>
               <Label htmlFor='memo'>메모</Label>
-              <Input id='memo' {...register('memo')} placeholder='메모 입력' />
+              <Textarea
+                id='memo'
+                {...register('memo')}
+                placeholder='메모 입력'
+                className='resize-none'
+                rows={3}
+              />
             </div>
 
             {/* 알림 발송 */}
