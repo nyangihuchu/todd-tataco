@@ -52,7 +52,8 @@ export function FilterBar({ companies }: FilterBarProps) {
         value={companyId}
         onValueChange={(v) => updateParam('company_id', v === 'all' ? '' : v)}
       >
-        <SelectTrigger className='h-8 w-40 text-xs'>
+        {/* 모바일에서 full-width, sm 이상에서 고정 너비 */}
+        <SelectTrigger className='h-8 w-full text-xs sm:w-40'>
           <SelectValue placeholder='업체 전체' />
         </SelectTrigger>
         <SelectContent>
@@ -69,7 +70,8 @@ export function FilterBar({ companies }: FilterBarProps) {
         value={priority}
         onValueChange={(v) => updateParam('priority', v === 'all' ? '' : v)}
       >
-        <SelectTrigger className='h-8 w-36 text-xs'>
+        {/* 모바일에서 full-width, sm 이상에서 고정 너비 */}
+        <SelectTrigger className='h-8 w-full text-xs sm:w-36'>
           <SelectValue placeholder='우선순위 전체' />
         </SelectTrigger>
         <SelectContent>

@@ -47,10 +47,12 @@ export function TasksClient({ initialTasks, companies }: TasksClientProps) {
   return (
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold'>업무 관리</h1>
+        {/* 모바일에서 h1이 너무 크지 않도록 크기 조정 */}
+        <h1 className='text-xl font-bold sm:text-2xl'>업무 관리</h1>
         <Button onClick={openCreate}>
-          <Plus size={16} className='mr-2' />
-          업무 추가
+          <Plus size={16} className='sm:mr-2' />
+          {/* 모바일에서 텍스트 숨김, sm 이상에서 표시 */}
+          <span className='hidden sm:inline'>업무 추가</span>
         </Button>
       </div>
 

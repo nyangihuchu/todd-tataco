@@ -106,12 +106,13 @@ export function TaskCardContent({
       )}
       onClick={onClick ? () => onClick(task) : undefined}
     >
-      <CardContent className='space-y-2 p-3'>
-        <div className='flex items-start justify-between gap-1'>
-          {/* 드래그 핸들 */}
+      <CardContent className='space-y-2 p-3 sm:p-4'>
+        {/* 제목 행: 드래그 핸들 + 제목 + 뱃지/메뉴 */}
+        <div className='flex flex-wrap items-start gap-1'>
+          {/* 드래그 핸들: 모바일에서 숨김 */}
           <div
             {...dragHandleProps}
-            className='mt-0.5 shrink-0 cursor-grab touch-none text-muted-foreground/40 active:cursor-grabbing'
+            className='mt-0.5 hidden shrink-0 cursor-grab touch-none text-muted-foreground/40 active:cursor-grabbing md:flex'
             onClick={(e) => e.stopPropagation()}
           >
             <GripVertical size={14} />
@@ -125,13 +126,14 @@ export function TaskCardContent({
             {onEdit && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
+                  {/* 모바일에서 터치 편의를 위해 버튼 크기 확대 */}
                   <Button
                     variant='ghost'
                     size='icon'
-                    className='h-6 w-6'
+                    className='h-7 w-7 sm:h-6 sm:w-6'
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <MoreVertical size={12} />
+                    <MoreVertical size={14} />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
@@ -156,19 +158,19 @@ export function TaskCardContent({
             )}
           </div>
         </div>
-        <div className='flex items-center gap-1 text-xs text-muted-foreground'>
-          <Building2 size={12} />
+        <div className='flex items-center gap-1.5 text-xs text-muted-foreground'>
+          <Building2 size={12} className='shrink-0' />
           {/* 업체명도 긴 경우 말줄임 처리 */}
           <span className='truncate'>{task.company_name}</span>
         </div>
         {task.due_date && (
           <div
             className={cn(
-              'flex items-center gap-1 text-xs',
+              'flex items-center gap-1.5 text-xs',
               isOverdue ? 'font-medium text-rose-500' : 'text-muted-foreground',
             )}
           >
-            <CalendarDays size={12} />
+            <CalendarDays size={12} className='shrink-0' />
             <span>{task.due_date}</span>
           </div>
         )}
