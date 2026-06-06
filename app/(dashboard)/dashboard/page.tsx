@@ -1,10 +1,14 @@
 import { Clock, Loader2, CheckCircle2, MessageSquare, AlertCircle } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getDashboardStats } from '@/lib/actions/dashboard'
+import { getDashboardStats, getChartStats } from '@/lib/actions/dashboard'
+import { TaskStatusChart } from '@/components/dashboard/task-status-chart'
+import { CompanyTaskChart } from '@/components/dashboard/company-task-chart'
 
 export default async function DashboardPage() {
-  // 대시보드 통계를 서버에서 직접 조회
-  const { data: stats } = await getDashboardStats()
+  const [{ data: stats }, { data: chartStats }] = await Promise.all([
+    getDashboardStats(),
+    getChartStats(),
+  ])
 
   // 통계가 없을 경우 0으로 fallback
   const todayDueCount = stats?.todayDueCount ?? 0
@@ -39,6 +43,12 @@ export default async function DashboardPage() {
             </CardContent>
           </Card>
         ))}
+      </div>
+
+      {/* 통계 차트 */}
+      <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
+        <TaskStatusChart data={chartStats?.statusCounts ?? []} />
+        <CompanyTaskChart data={chartStats?.companyCounts ?? []} />
       </div>
 
       {/* 최근 댓글 */}

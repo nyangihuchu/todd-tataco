@@ -28,6 +28,7 @@ npm run type-check   # TypeScript 타입 검사 (빌드 없이)
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SERVICE_ROLE_KEY=   # Cron 라우트에서 RLS 우회 시 사용 (서버 전용)
 
 # 서비스 URL (알림 메시지 내 링크)
 NEXT_PUBLIC_SITE_URL=https://todd-tataco.vercel.app

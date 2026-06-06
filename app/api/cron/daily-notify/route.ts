@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import { sendKakaoNotificationBulk, type KakaoNotificationPayload } from '@/lib/solapi'
 
 // Vercel Cron이 호출하는 엔드포인트 — vercel.json에서 매일 UTC 00:00 (KST 09:00) 실행
@@ -76,12 +77,16 @@ export async function GET(request: Request) {
   try {
     await sendKakaoNotificationBulk(payloads)
 
-    // service_role 권한이 필요하므로 별도 Supabase Admin 클라이언트를 쓰거나
-    // notification_logs INSERT 정책을 service_role로 열어두어야 한다.
-    // 여기서는 Server Route라 쿠키 세션 없이 동작하므로 RLS bypass 불가.
-    // 로그 저장은 향후 service_role 클라이언트로 교체 예정.
-    console.log('[daily-notify] 발송 완료:', logInserts.length, '건')
+    // service_role 클라이언트로 RLS 우회 후 로그 저장
+    const adminClient = createAdminClient()
+    const { error: logError } = await adminClient
+      .from('notification_logs')
+      .insert(logInserts)
+    if (logError) {
+      console.error('[daily-notify] 로그 저장 실패:', logError.message)
+    }
 
+    console.log('[daily-notify] 발송 완료:', logInserts.length, '건')
     return NextResponse.json({ sent: logInserts.length })
   } catch (err) {
     console.error('[daily-notify] 발송 실패:', err)

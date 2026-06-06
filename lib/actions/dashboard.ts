@@ -118,3 +118,47 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
     error: null,
   }
 }
+
+// 차트용 집계 타입
+export type ChartStats = {
+  statusCounts: { status: string; label: string; count: number; fill: string }[]
+  companyCounts: { name: string; count: number }[]
+}
+
+// 상태별·업체별 업무 수 집계 (차트용)
+export async function getChartStats(): Promise<ActionResult<ChartStats>> {
+  const supabase = await createClient()
+
+  const { data: tasks, error } = await supabase
+    .from('tasks')
+    .select('status, companies(name)')
+
+  if (error) return { data: null, error: error.message }
+
+  // 상태별 집계
+  const statusMap: Record<string, number> = { pending: 0, in_progress: 0, review: 0, done: 0 }
+  for (const task of tasks ?? []) {
+    if (task.status in statusMap) statusMap[task.status]++
+  }
+
+  const statusCounts = [
+    { status: 'pending',    label: '대기',     count: statusMap.pending,    fill: 'var(--color-pending)'    },
+    { status: 'in_progress',label: '진행중',   count: statusMap.in_progress,fill: 'var(--color-in_progress)'},
+    { status: 'review',     label: '확인요청', count: statusMap.review,     fill: 'var(--color-review)'     },
+    { status: 'done',       label: '완료',     count: statusMap.done,       fill: 'var(--color-done)'       },
+  ]
+
+  // 업체별 집계 (상위 10개)
+  const companyMap: Record<string, number> = {}
+  for (const task of tasks ?? []) {
+    const company = task.companies as { name: string } | null
+    if (!company?.name) continue
+    companyMap[company.name] = (companyMap[company.name] ?? 0) + 1
+  }
+  const companyCounts = Object.entries(companyMap)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10)
+
+  return { data: { statusCounts, companyCounts }, error: null }
+}
