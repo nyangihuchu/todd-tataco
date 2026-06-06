@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { Header } from '@/components/dashboard/header'
+import { BottomNav } from '@/components/dashboard/bottom-nav'
 
 export default function DashboardLayout({
   children,
@@ -27,22 +28,23 @@ async function AuthenticatedLayout({ children }: { children: React.ReactNode }) 
   const userEmail = user.email ?? ''
   const uid = user.id
 
-  const { data: company } = await supabase
-    .from('companies')
-    .select('contact_name')
-    .or(`user_id.eq.${uid},created_by.eq.${uid}`)
-    .limit(1)
-    .maybeSingle()
+  const [{ data: company }, { data: profile }] = await Promise.all([
+    supabase
+      .from('companies')
+      .select('contact_name')
+      .or(`user_id.eq.${uid},created_by.eq.${uid}`)
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from('profiles')
+      .select('display_name')
+      .eq('id', uid)
+      .single(),
+  ])
 
   if (!company?.contact_name) {
     redirect('/onboarding')
   }
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('display_name')
-    .eq('id', uid)
-    .single()
 
   const displayName = profile?.display_name ?? null
 
@@ -51,8 +53,9 @@ async function AuthenticatedLayout({ children }: { children: React.ReactNode }) 
       <Sidebar />
       <div className='flex flex-1 flex-col overflow-hidden'>
         <Header userEmail={userEmail} displayName={displayName} />
-        <main className='flex-1 overflow-y-auto p-6'>{children}</main>
+        <main className='flex-1 overflow-y-auto p-6 pb-20 md:pb-6'>{children}</main>
       </div>
+      <BottomNav />
     </div>
   )
 }

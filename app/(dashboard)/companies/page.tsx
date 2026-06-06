@@ -4,8 +4,10 @@ import { CompaniesClient } from '@/components/companies/companies-client'
 
 export default async function CompaniesPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const { data: companies } = await getCompanies()
+  const [{ data: { user } }, { data: companies }] = await Promise.all([
+    supabase.auth.getUser(),
+    getCompanies(),
+  ])
 
   return (
     <CompaniesClient

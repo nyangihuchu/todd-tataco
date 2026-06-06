@@ -23,7 +23,7 @@ export async function getTasks(filters?: {
 
   let query = supabase
     .from('tasks')
-    .select('*, companies(name)')
+    .select('id, title, status, priority, due_date, start_date, created_by, company_id, memo, updated_at, companies(name)')
     .order('created_at', { ascending: false })
 
   // 업체 ID 필터 동적 적용
