@@ -19,7 +19,7 @@ export async function getComments(
 
   const { data, error } = await supabase
     .from('comments')
-    .select('*, profiles(display_name)')
+    .select('*, profiles(display_name, full_name, username)')
     .eq('task_id', taskId)
     .order('created_at', { ascending: true })
 
@@ -27,12 +27,15 @@ export async function getComments(
     return { data: null, error: error.message }
   }
 
-  // profiles 중첩 객체를 author_name 필드로 평탄화
-  const flattened = (data ?? []).map((c) => ({
-    ...c,
-    author_name: (c.profiles as { display_name: string | null } | null)?.display_name ?? null,
-    profiles: undefined,
-  })) as CommentWithAuthor[]
+  // profiles 중첩 객체를 author_name 필드로 평탄화 (display_name → full_name → username 순 fallback)
+  const flattened = (data ?? []).map((c) => {
+    const p = c.profiles as { display_name: string | null; full_name: string | null; username: string | null } | null
+    return {
+      ...c,
+      author_name: p?.display_name ?? p?.full_name ?? p?.username ?? null,
+      profiles: undefined,
+    }
+  }) as CommentWithAuthor[]
 
   return { data: flattened, error: null }
 }
