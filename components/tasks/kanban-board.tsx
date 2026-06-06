@@ -123,7 +123,7 @@ export function KanbanBoard({ tasks, onEditTask }: KanbanBoardProps) {
 
   return (
     <>
-      <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+      <DndContext id='kanban-dnd' sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         {/* 칸반 컬럼 컨테이너: 모바일 세로 스택 / md 이상 가로 스크롤 */}
         <div className='flex flex-col gap-4 md:flex-row md:overflow-x-auto md:pb-2'>
           {/* 지연 컬럼: STATUSES에 없으므로 드롭해도 상태 변경 안 됨 */}
