@@ -106,13 +106,19 @@ export async function updateTask(
 export async function deleteTask(id: string): Promise<ActionResult<null>> {
   const supabase = await createClient()
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('tasks')
     .delete()
     .eq('id', id)
+    .select('id')
 
   if (error) {
     return { data: null, error: error.message }
+  }
+
+  // RLS가 막으면 data가 빈 배열로 반환됨
+  if (!data || data.length === 0) {
+    return { data: null, error: '삭제 권한이 없습니다' }
   }
 
   revalidatePath('/tasks')
