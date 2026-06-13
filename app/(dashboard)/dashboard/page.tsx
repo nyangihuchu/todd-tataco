@@ -2,7 +2,6 @@ import { Clock, Loader2, CheckCircle2, MessageSquare, AlertCircle } from 'lucide
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getDashboardStats, getChartStats } from '@/lib/actions/dashboard'
 import { TaskStatusChart } from '@/components/dashboard/task-status-chart'
-import { CompanyTaskChart } from '@/components/dashboard/company-task-chart'
 
 export default async function DashboardPage() {
   const [{ data: stats }, { data: chartStats }] = await Promise.all([
@@ -46,9 +45,8 @@ export default async function DashboardPage() {
       </div>
 
       {/* 통계 차트 */}
-      <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
+      <div className='grid grid-cols-1 gap-4'>
         <TaskStatusChart data={chartStats?.statusCounts ?? []} />
-        <CompanyTaskChart data={chartStats?.companyCounts ?? []} />
       </div>
 
       {/* 최근 댓글 */}

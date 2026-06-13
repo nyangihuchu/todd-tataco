@@ -16,23 +16,22 @@ import { TaskDetailSheet } from '@/components/tasks/task-detail-sheet'
 import { TaskCardContent } from '@/components/tasks/task-card'
 import { updateTaskStatus } from '@/lib/actions/tasks'
 import { getComments } from '@/lib/actions/comments'
-import type { TaskWithCompany } from '@/lib/actions/tasks'
+import type { TaskWithCategory } from '@/lib/actions/tasks'
 import type { CommentWithAuthor } from '@/lib/actions/comments'
 
-// tasks 테이블 status 컬럼의 UI 리터럴 타입
-type Status = 'pending' | 'in_progress' | 'review' | 'done'
+type Status = 'pending' | 'in_progress' | 'done'
 
-const STATUSES: Status[] = ['pending', 'in_progress', 'review', 'done']
+const STATUSES: Status[] = ['pending', 'in_progress', 'done']
 
 interface KanbanBoardProps {
-  tasks: TaskWithCompany[]
-  onEditTask: (task: TaskWithCompany) => void
+  tasks: TaskWithCategory[]
+  onEditTask: (task: TaskWithCategory) => void
 }
 
 export function KanbanBoard({ tasks, onEditTask }: KanbanBoardProps) {
-  const [localTasks, setLocalTasks] = useState<TaskWithCompany[]>(tasks)
-  const [activeTask, setActiveTask] = useState<TaskWithCompany | null>(null)
-  const [selectedTask, setSelectedTask] = useState<TaskWithCompany | null>(null)
+  const [localTasks, setLocalTasks] = useState<TaskWithCategory[]>(tasks)
+  const [activeTask, setActiveTask] = useState<TaskWithCategory | null>(null)
+  const [selectedTask, setSelectedTask] = useState<TaskWithCategory | null>(null)
   const [sheetOpen, setSheetOpen] = useState(false)
   const [comments, setComments] = useState<CommentWithAuthor[]>([])
   const [, startTransition] = useTransition()
@@ -101,7 +100,7 @@ export function KanbanBoard({ tasks, onEditTask }: KanbanBoardProps) {
     })
   }
 
-  function handleCardClick(task: TaskWithCompany) {
+  function handleCardClick(task: TaskWithCategory) {
     setSelectedTask(task)
     setSheetOpen(true)
   }
@@ -111,12 +110,12 @@ export function KanbanBoard({ tasks, onEditTask }: KanbanBoardProps) {
     setLocalTasks((prev) => prev.filter((t) => t.id !== id))
   }
 
-  const tasksByStatus = STATUSES.reduce<Record<Status, TaskWithCompany[]>>(
+  const tasksByStatus = STATUSES.reduce<Record<Status, TaskWithCategory[]>>(
     (acc, status) => {
       acc[status] = localTasks.filter((t) => t.status === status)
       return acc
     },
-    { pending: [], in_progress: [], review: [], done: [] },
+    { pending: [], in_progress: [], done: [] },
   )
 
   // 마감일 초과 + 완료 아님 (ISO 문자열 직접 비교)

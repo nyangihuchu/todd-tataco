@@ -5,33 +5,30 @@ import { createClient } from '@/lib/supabase/server'
 import type { Tables, TablesInsert, TablesUpdate } from '@/lib/supabase/database.types'
 import type { ActionResult } from './types'
 
-// companies JOIN 결과를 평탄화한 업무 타입
-export type TaskWithCompany = Tables<'tasks'> & { company_name: string | null }
-
-// Supabase JOIN 응답의 중간 타입 (평탄화 전)
-type TaskWithCompanyRaw = Tables<'tasks'> & {
-  companies: { name: string } | null
+export type TaskWithCategory = Tables<'tasks'> & {
+  category_name: string | null
+  category_color: string | null
 }
 
-// 업무 목록 조회 (업체 이름 포함, 생성일 내림차순)
-// 선택적으로 company_id, priority 필터 적용 가능
+type TaskWithCategoryRaw = Tables<'tasks'> & {
+  categories: { name: string; color: string } | null
+}
+
 export async function getTasks(filters?: {
-  company_id?: string
+  category_id?: string
   priority?: string
-}): Promise<ActionResult<TaskWithCompany[]>> {
+}): Promise<ActionResult<TaskWithCategory[]>> {
   const supabase = await createClient()
 
   let query = supabase
     .from('tasks')
-    .select('id, title, status, priority, due_date, start_date, created_by, company_id, memo, updated_at, companies(name)')
+    .select('id, title, status, priority, due_date, start_date, created_by, category_id, memo, updated_at, categories(name, color)')
     .order('created_at', { ascending: false })
 
-  // 업체 ID 필터 동적 적용
-  if (filters?.company_id) {
-    query = query.eq('company_id', filters.company_id)
+  if (filters?.category_id) {
+    query = query.eq('category_id', filters.category_id)
   }
 
-  // 우선순위 필터 동적 적용
   if (filters?.priority) {
     query = query.eq('priority', filters.priority)
   }
@@ -42,17 +39,16 @@ export async function getTasks(filters?: {
     return { data: null, error: error.message }
   }
 
-  // companies 중첩 객체를 company_name 필드로 평탄화
-  const flattened = (data as TaskWithCompanyRaw[]).map((t) => ({
+  const flattened = (data as TaskWithCategoryRaw[]).map((t) => ({
     ...t,
-    company_name: t.companies?.name ?? null,
-    companies: undefined,
-  })) as TaskWithCompany[]
+    category_name: t.categories?.name ?? null,
+    category_color: t.categories?.color ?? null,
+    categories: undefined,
+  })) as TaskWithCategory[]
 
   return { data: flattened, error: null }
 }
 
-// 업무 생성 후 생성된 레코드 반환
 export async function createTask(
   values: TablesInsert<'tasks'>
 ): Promise<ActionResult<Tables<'tasks'>>> {
@@ -80,7 +76,6 @@ export async function createTask(
   return { data, error: null }
 }
 
-// 업무 수정 후 수정된 레코드 반환
 export async function updateTask(
   id: string,
   values: TablesUpdate<'tasks'>
@@ -102,7 +97,6 @@ export async function updateTask(
   return { data, error: null }
 }
 
-// 업무 삭제
 export async function deleteTask(id: string): Promise<ActionResult<null>> {
   const supabase = await createClient()
 
@@ -116,7 +110,6 @@ export async function deleteTask(id: string): Promise<ActionResult<null>> {
     return { data: null, error: error.message }
   }
 
-  // RLS가 막으면 data가 빈 배열로 반환됨
   if (!data || data.length === 0) {
     return { data: null, error: '삭제 권한이 없습니다' }
   }
@@ -125,7 +118,6 @@ export async function deleteTask(id: string): Promise<ActionResult<null>> {
   return { data: null, error: null }
 }
 
-// 업무 상태만 업데이트 (칸반 보드 드래그 등 상태 전환에 활용)
 export async function updateTaskStatus(
   id: string,
   status: Tables<'tasks'>['status']

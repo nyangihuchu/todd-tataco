@@ -1,6 +1,6 @@
 'use client'
 
-import { Building2, CalendarDays, GripVertical, MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { Tag, CalendarDays, GripVertical, MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import { Card, CardContent } from '@/components/ui/card'
@@ -15,7 +15,7 @@ import {
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { deleteTask } from '@/lib/actions/tasks'
-import type { TaskWithCompany } from '@/lib/actions/tasks'
+import type { TaskWithCategory } from '@/lib/actions/tasks'
 
 type Priority = 'high' | 'medium' | 'low'
 
@@ -32,9 +32,9 @@ const priorityLabel: Record<Priority, string> = {
 }
 
 interface TaskCardProps {
-  task: TaskWithCompany
-  onClick: (task: TaskWithCompany) => void
-  onEdit: (task: TaskWithCompany) => void
+  task: TaskWithCategory
+  onClick: (task: TaskWithCategory) => void
+  onEdit: (task: TaskWithCategory) => void
   onDelete?: (id: string) => void
   isDragging?: boolean
 }
@@ -60,9 +60,9 @@ export function TaskCard({ task, onClick, onEdit, onDelete, isDragging }: TaskCa
 }
 
 interface TaskCardContentProps {
-  task: TaskWithCompany
-  onClick?: (task: TaskWithCompany) => void
-  onEdit?: (task: TaskWithCompany) => void
+  task: TaskWithCategory
+  onClick?: (task: TaskWithCategory) => void
+  onEdit?: (task: TaskWithCategory) => void
   onDelete?: (id: string) => void
   isDragOverlay?: boolean
   dragHandleProps?: React.HTMLAttributes<HTMLDivElement>
@@ -77,11 +77,9 @@ export function TaskCardContent({
   dragHandleProps,
 }: TaskCardContentProps) {
   const today = new Date().toISOString().split('T')[0]
-  // due_date가 없거나 오늘 이전이고 완료 상태가 아니면 기한 초과로 표시
   const isOverdue =
     task.due_date != null && task.due_date < today && task.status !== 'done'
 
-  // DB에서 오는 priority는 string 타입이므로 리터럴 타입으로 안전하게 캐스팅
   const priority = (
     ['high', 'medium', 'low'].includes(task.priority) ? task.priority : 'medium'
   ) as Priority
@@ -107,9 +105,7 @@ export function TaskCardContent({
       onClick={onClick ? () => onClick(task) : undefined}
     >
       <CardContent className='space-y-2 p-3 sm:p-4'>
-        {/* 제목 행: 드래그 핸들 + 제목 + 뱃지/메뉴 */}
         <div className='flex flex-wrap items-start gap-1'>
-          {/* 드래그 핸들: 모바일에서 숨김 */}
           <div
             {...dragHandleProps}
             className='mt-0.5 hidden shrink-0 cursor-grab touch-none text-muted-foreground/40 active:cursor-grabbing md:flex'
@@ -117,7 +113,6 @@ export function TaskCardContent({
           >
             <GripVertical size={14} />
           </div>
-          {/* 컬럼 너비가 줄어들어도 제목이 잘리도록 truncate 처리 */}
           <p className='min-w-0 flex-1 truncate text-sm font-medium leading-snug'>{task.title}</p>
           <div className='flex shrink-0 items-center gap-1'>
             <Badge variant='outline' className={cn('text-xs', priorityClass[priority])}>
@@ -126,7 +121,6 @@ export function TaskCardContent({
             {onEdit && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  {/* 모바일에서 터치 편의를 위해 버튼 크기 확대 */}
                   <Button
                     variant='ghost'
                     size='icon'
@@ -158,11 +152,12 @@ export function TaskCardContent({
             )}
           </div>
         </div>
-        <div className='flex items-center gap-1.5 text-xs text-muted-foreground'>
-          <Building2 size={12} className='shrink-0' />
-          {/* 업체명도 긴 경우 말줄임 처리 */}
-          <span className='truncate'>{task.company_name}</span>
-        </div>
+        {task.category_name && (
+          <div className='flex items-center gap-1.5 text-xs text-muted-foreground'>
+            <Tag size={12} className='shrink-0' />
+            <span className='truncate'>{task.category_name}</span>
+          </div>
+        )}
         {task.due_date && (
           <div
             className={cn(

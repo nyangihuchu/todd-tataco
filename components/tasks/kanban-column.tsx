@@ -7,10 +7,9 @@ import { Badge } from '@/components/ui/badge'
 import { EmptyState } from '@/components/ui/empty-state'
 import { cn } from '@/lib/utils'
 import { TaskCard } from '@/components/tasks/task-card'
-import type { TaskWithCompany } from '@/lib/actions/tasks'
+import type { TaskWithCategory } from '@/lib/actions/tasks'
 
-// tasks 테이블 status 컬럼의 실제 값 + 지연(overdue) 가상 상태
-type Status = 'pending' | 'in_progress' | 'review' | 'done' | 'overdue'
+type Status = 'pending' | 'in_progress' | 'done' | 'overdue'
 
 const columnConfig: Record<
   Status,
@@ -37,13 +36,6 @@ const columnConfig: Record<
     dotClass: 'bg-blue-500',
     labelClass: 'text-blue-700 dark:text-blue-400',
   },
-  review: {
-    label: '확인요청',
-    colorClass: 'bg-amber-50 dark:bg-amber-950',
-    overClass: 'ring-2 ring-amber-300',
-    dotClass: 'bg-amber-500',
-    labelClass: 'text-amber-700 dark:text-amber-400',
-  },
   done: {
     label: '완료',
     colorClass: 'bg-emerald-50 dark:bg-emerald-950',
@@ -55,9 +47,9 @@ const columnConfig: Record<
 
 interface KanbanColumnProps {
   status: Status
-  tasks: TaskWithCompany[]
-  onCardClick: (task: TaskWithCompany) => void
-  onEditTask: (task: TaskWithCompany) => void
+  tasks: TaskWithCategory[]
+  onCardClick: (task: TaskWithCategory) => void
+  onEditTask: (task: TaskWithCategory) => void
   onDeleteTask?: (id: string) => void
   activeTaskId: string | null
 }

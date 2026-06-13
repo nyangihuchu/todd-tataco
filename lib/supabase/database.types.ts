@@ -14,6 +14,38 @@ export type Database = {
   }
   public: {
     Tables: {
+      categories: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "categories_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comments: {
         Row: {
           author_id: string | null
@@ -112,7 +144,6 @@ export type Database = {
       }
       notification_logs: {
         Row: {
-          company_id: string | null
           error_msg: string | null
           id: string
           phone: string
@@ -122,7 +153,6 @@ export type Database = {
           type: string
         }
         Insert: {
-          company_id?: string | null
           error_msg?: string | null
           id?: string
           phone: string
@@ -132,7 +162,6 @@ export type Database = {
           type: string
         }
         Update: {
-          company_id?: string | null
           error_msg?: string | null
           id?: string
           phone?: string
@@ -142,13 +171,6 @@ export type Database = {
           type?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "notification_logs_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "notification_logs_task_id_fkey"
             columns: ["task_id"]
@@ -160,7 +182,6 @@ export type Database = {
       }
       notification_schedules: {
         Row: {
-          company_id: string | null
           created_at: string | null
           error_msg: string | null
           id: string
@@ -170,7 +191,6 @@ export type Database = {
           task_id: string | null
         }
         Insert: {
-          company_id?: string | null
           created_at?: string | null
           error_msg?: string | null
           id?: string
@@ -180,7 +200,6 @@ export type Database = {
           task_id?: string | null
         }
         Update: {
-          company_id?: string | null
           created_at?: string | null
           error_msg?: string | null
           id?: string
@@ -190,13 +209,6 @@ export type Database = {
           task_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "notification_schedules_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "notification_schedules_task_id_fkey"
             columns: ["task_id"]
@@ -250,8 +262,7 @@ export type Database = {
       }
       tasks: {
         Row: {
-          assignee_id: string | null
-          company_id: string | null
+          category_id: string | null
           created_at: string
           created_by: string | null
           due_date: string | null
@@ -264,8 +275,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          assignee_id?: string | null
-          company_id?: string | null
+          category_id?: string | null
           created_at?: string
           created_by?: string | null
           due_date?: string | null
@@ -278,8 +288,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          assignee_id?: string | null
-          company_id?: string | null
+          category_id?: string | null
           created_at?: string
           created_by?: string | null
           due_date?: string | null
@@ -293,17 +302,10 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "tasks_assignee_id_fkey"
-            columns: ["assignee_id"]
+            foreignKeyName: "tasks_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "tasks_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
+            referencedRelation: "categories"
             referencedColumns: ["id"]
           },
           {

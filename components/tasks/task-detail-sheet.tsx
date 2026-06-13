@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
-import { Building2, CalendarDays, MessageSquare, Send, X } from 'lucide-react'
+import { Tag, CalendarDays, MessageSquare, Send, X } from 'lucide-react'
 import {
   Sheet,
   SheetContent,
@@ -14,16 +14,14 @@ import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { createComment, deleteComment } from '@/lib/actions/comments'
 import type { CommentWithAuthor } from '@/lib/actions/comments'
-import type { TaskWithCompany } from '@/lib/actions/tasks'
+import type { TaskWithCategory } from '@/lib/actions/tasks'
 
-// DB의 status/priority는 string이지만 UI에서 사용할 리터럴 타입으로 관리
-type Status = 'pending' | 'in_progress' | 'review' | 'done'
+type Status = 'pending' | 'in_progress' | 'done'
 type Priority = 'high' | 'medium' | 'low'
 
 const statusLabel: Record<Status, string> = {
   pending: '대기',
   in_progress: '진행중',
-  review: '확인요청',
   done: '완료',
 }
 
@@ -40,7 +38,7 @@ const priorityVariant: Record<Priority, 'destructive' | 'secondary' | 'outline'>
 }
 
 interface TaskDetailSheetProps {
-  task: TaskWithCompany | null
+  task: TaskWithCategory | null
   open: boolean
   onOpenChange: (open: boolean) => void
   comments?: CommentWithAuthor[]
@@ -57,7 +55,6 @@ export function TaskDetailSheet({
   const [comment, setComment] = useState('')
   const [isPending, startTransition] = useTransition()
 
-  // 댓글 등록 처리
   function handleCommentSubmit() {
     if (!comment.trim() || !task) return
 
@@ -72,7 +69,6 @@ export function TaskDetailSheet({
     })
   }
 
-  // 댓글 삭제 처리
   function handleDeleteComment(commentId: string) {
     startTransition(async () => {
       const result = await deleteComment(commentId)
@@ -84,7 +80,6 @@ export function TaskDetailSheet({
     })
   }
 
-  // Enter 키로 댓글 제출 (Shift+Enter는 줄바꿈)
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -94,9 +89,8 @@ export function TaskDetailSheet({
 
   if (!task) return null
 
-  // DB string → 리터럴 타입으로 안전하게 캐스팅
   const status = (
-    ['pending', 'in_progress', 'review', 'done'].includes(task.status)
+    ['pending', 'in_progress', 'done'].includes(task.status)
       ? task.status
       : 'pending'
   ) as Status
@@ -119,12 +113,13 @@ export function TaskDetailSheet({
         </SheetHeader>
 
         <div className='flex-1 overflow-y-auto p-6 space-y-4'>
-          {/* 업무 정보 */}
           <div className='space-y-2 text-sm'>
-            <div className='flex items-center gap-2 text-muted-foreground'>
-              <Building2 size={14} />
-              <span>{task.company_name}</span>
-            </div>
+            {task.category_name && (
+              <div className='flex items-center gap-2 text-muted-foreground'>
+                <Tag size={14} />
+                <span>{task.category_name}</span>
+              </div>
+            )}
             {task.due_date && (
               <div className='flex items-center gap-2 text-muted-foreground'>
                 <CalendarDays size={14} />
@@ -138,7 +133,6 @@ export function TaskDetailSheet({
 
           <Separator />
 
-          {/* 댓글 목록 */}
           <div className='space-y-3'>
             <div className='flex items-center gap-2 text-sm font-medium'>
               <MessageSquare size={14} />
@@ -153,7 +147,6 @@ export function TaskDetailSheet({
                   <li key={c.id} className='group flex items-start gap-2 rounded-md bg-muted/50 px-3 py-2'>
                     <div className='flex-1 space-y-0.5'>
                       <div className='flex items-center gap-1.5'>
-                        {/* 작성자 이름 (없으면 '알 수 없음' 표시) */}
                         <span className='text-xs font-medium'>
                           {c.author_name ?? '알 수 없음'}
                         </span>
@@ -168,7 +161,6 @@ export function TaskDetailSheet({
                       </div>
                       <p className='text-sm'>{c.content}</p>
                     </div>
-                    {/* 삭제 버튼: 호버 시 표시, RLS가 본인 댓글만 삭제 보장 */}
                     <Button
                       variant='ghost'
                       size='icon'
@@ -186,7 +178,6 @@ export function TaskDetailSheet({
           </div>
         </div>
 
-        {/* 댓글 입력 */}
         <div className='border-t p-4'>
           <div className='flex gap-2'>
             <textarea
