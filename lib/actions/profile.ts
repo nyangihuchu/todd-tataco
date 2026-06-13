@@ -35,3 +35,31 @@ export async function updateDisplayName(
 
   return { data: null, error: null }
 }
+
+export async function updateProfile(values: {
+  display_name?: string | null
+  phone?: string | null
+}): Promise<ActionResult<null>> {
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    return { data: null, error: '인증이 필요합니다' }
+  }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update(values)
+    .eq('id', user.id)
+
+  if (error) {
+    return { data: null, error: error.message }
+  }
+
+  revalidatePath('/', 'layout')
+
+  return { data: null, error: null }
+}
