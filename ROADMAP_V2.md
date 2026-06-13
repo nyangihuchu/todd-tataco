@@ -26,11 +26,11 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
 | Phase | 설명 | 태스크 수 | 완료 | 진행률 |
 |-------|------|-----------|------|--------|
 | Phase 1 | DB 스키마 정리 및 코드 제거 | 8 | 8 | ✅ 100% |
-| Phase 2 | 핵심 기능 전환 | 6 | 2 | 33% |
+| Phase 2 | 핵심 기능 전환 | 6 | 5 | 83% |
 | Phase 3 | 캘린더 강화 | 5 | 0 | 0% |
 | Phase 4 | 알림 시스템 1인화 | 6 | 3 | 50% |
 | Phase 5 | 품질 마무리 | 4 | 0 | 0% |
-| **합계** | | **29** | **13** | **45%** |
+| **합계** | | **29** | **16** | **55%** |
 
 ---
 
@@ -111,21 +111,21 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
   - 요약 카드 레이아웃 조정 (2x2 그리드 또는 단일 행)
   - 관련 파일: `app/(dashboard)/dashboard/page.tsx`, `lib/actions/dashboard.ts`
 
-- [ ] **T010**: 업무 관리 페이지 칸반 전환 — `대기중`
+- [x] **T010**: 업무 관리 페이지 칸반 전환 — `완료`
   - 칸반 컬럼을 3개로 축소: `pending`(할일) / `in_progress`(진행중) / `done`(완료)
   - `components/tasks/filter-bar.tsx`에서 업체 필터 제거, 카테고리 필터 드롭다운 추가
   - `components/tasks/task-card.tsx`에서 업체명(`company_name`) 표시 제거
   - 카드에 카테고리 뱃지 추가 (카테고리 색상 반영)
   - 관련 파일: `components/tasks/kanban-column.tsx`, `components/tasks/filter-bar.tsx`, `components/tasks/task-card.tsx`, `components/tasks/tasks-client.tsx`
 
-- [ ] **T011**: 업무 등록/수정 폼 전환 — `대기중`
+- [x] **T011**: 업무 등록/수정 폼 전환 — `완료`
   - `components/tasks/task-form-modal.tsx`에서 업체 선택 필드 제거
   - 담당자(`assignee_id`) 필드 제거
   - 카테고리 선택 `<Select>` 필드 추가 (categories 목록 조회 후 렌더링)
   - `lib/actions/tasks.ts`의 `createTask()` / `updateTask()` 파라미터에서 `company_id`, `assignee_id` 제거
   - 관련 파일: `components/tasks/task-form-modal.tsx`, `lib/actions/tasks.ts`
 
-- [ ] **T012**: 카테고리 관리 Server Action 신규 작성 — `대기중`
+- [x] **T012**: 카테고리 관리 Server Action 신규 작성 — `완료`
   - `lib/actions/categories.ts` 파일 신규 생성
   - `getCategories()`: 현재 사용자의 카테고리 목록 조회
   - `createCategory(values)`: 카테고리 생성 (name, color)
