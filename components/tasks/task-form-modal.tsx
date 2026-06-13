@@ -27,6 +27,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { createTask, updateTask } from '@/lib/actions/tasks'
 import { sendTaskNotification, scheduleTaskNotification } from '@/lib/actions/notifications'
 import type { TaskWithCategory } from '@/lib/actions/tasks'
+import type { Category } from '@/lib/actions/categories'
 
 function toDatetimeLocal(iso: string | null | undefined): string {
   if (!iso) return ''
@@ -41,6 +42,7 @@ const schema = z.object({
   title: z.string().min(1, '업무명을 입력하세요'),
   priority: z.enum(['high', 'medium', 'low']),
   status: z.enum(['pending', 'in_progress', 'done']),
+  category_id: z.string().optional(),
   start_date: z.string().optional(),
   due_date: z.string().optional(),
   memo: z.string().optional(),
@@ -68,6 +70,7 @@ interface TaskFormModalProps {
   onOpenChange: (open: boolean) => void
   mode: 'create' | 'edit'
   defaultValues?: TaskWithCategory
+  categories?: Category[]
   onSuccess?: () => void
 }
 
@@ -76,6 +79,7 @@ export function TaskFormModal({
   onOpenChange,
   mode,
   defaultValues,
+  categories = [],
   onSuccess,
 }: TaskFormModalProps) {
   const [isPending, startTransition] = useTransition()
@@ -92,6 +96,7 @@ export function TaskFormModal({
       title: '',
       priority: 'medium',
       status: 'pending',
+      category_id: '',
       start_date: '',
       due_date: '',
       memo: '',
@@ -116,6 +121,7 @@ export function TaskFormModal({
             ? defaultValues?.status
             : 'pending'
         ) as FormValues['status'],
+        category_id: defaultValues?.category_id ?? '',
         start_date: toDatetimeLocal(defaultValues?.start_date),
         due_date: toDatetimeLocal(defaultValues?.due_date),
         memo: defaultValues?.memo ?? '',
@@ -136,6 +142,7 @@ export function TaskFormModal({
           title: data.title,
           priority: data.priority,
           status: data.status,
+          category_id: data.category_id || null,
           start_date,
           due_date,
           memo: data.memo || null,
@@ -170,6 +177,7 @@ export function TaskFormModal({
           title: data.title,
           priority: data.priority,
           status: data.status,
+          category_id: data.category_id || null,
           start_date,
           due_date,
           memo: data.memo || null,
@@ -268,6 +276,37 @@ export function TaskFormModal({
                 />
               </div>
             </div>
+
+            {categories.length > 0 && (
+              <div className='flex flex-col gap-1'>
+                <Label>카테고리</Label>
+                <Controller
+                  name='category_id'
+                  control={control}
+                  render={({ field }) => (
+                    <Select onValueChange={field.onChange} value={field.value ?? ''}>
+                      <SelectTrigger>
+                        <SelectValue placeholder='카테고리 없음' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value=''>없음</SelectItem>
+                        {categories.map((cat) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            <span className='flex items-center gap-1.5'>
+                              <span
+                                className='inline-block h-3 w-3 shrink-0 rounded-full'
+                                style={{ background: cat.color }}
+                              />
+                              {cat.name}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+              </div>
+            )}
 
             <div className='flex flex-col gap-1'>
               <Label htmlFor='start_date'>시작일</Label>

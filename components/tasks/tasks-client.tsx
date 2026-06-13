@@ -8,12 +8,14 @@ import { KanbanBoard } from '@/components/tasks/kanban-board'
 import { TaskFormModal } from '@/components/tasks/task-form-modal'
 import { FilterBar } from '@/components/tasks/filter-bar'
 import type { TaskWithCategory } from '@/lib/actions/tasks'
+import type { Category } from '@/lib/actions/categories'
 
 interface TasksClientProps {
   initialTasks: TaskWithCategory[]
+  categories: Category[]
 }
 
-export function TasksClient({ initialTasks }: TasksClientProps) {
+export function TasksClient({ initialTasks, categories }: TasksClientProps) {
   const router = useRouter()
 
   const [modal, setModal] = useState<{
@@ -50,7 +52,7 @@ export function TasksClient({ initialTasks }: TasksClientProps) {
         </Button>
       </div>
 
-      <FilterBar />
+      <FilterBar categories={categories} />
 
       <KanbanBoard tasks={initialTasks} onEditTask={openEdit} />
 
@@ -59,6 +61,7 @@ export function TasksClient({ initialTasks }: TasksClientProps) {
         onOpenChange={closeModal}
         mode={modal.target ? 'edit' : 'create'}
         defaultValues={modal.target ?? undefined}
+        categories={categories}
         onSuccess={handleSuccess}
       />
     </div>

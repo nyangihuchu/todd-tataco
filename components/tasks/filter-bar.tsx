@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import type { Category } from '@/lib/actions/categories'
 
 const priorityOptions = [
   { value: 'high', label: '높음' },
@@ -17,13 +18,18 @@ const priorityOptions = [
   { value: 'low', label: '낮음' },
 ]
 
-export function FilterBar() {
+interface FilterBarProps {
+  categories?: Category[]
+}
+
+export function FilterBar({ categories = [] }: FilterBarProps) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
 
+  const categoryId = searchParams.get('category_id') ?? ''
   const priority = searchParams.get('priority') ?? ''
-  const hasFilter = !!priority
+  const hasFilter = !!categoryId || !!priority
 
   function updateParam(key: string, value: string) {
     const params = new URLSearchParams(searchParams.toString())
@@ -41,6 +47,31 @@ export function FilterBar() {
 
   return (
     <div className='flex flex-wrap items-center gap-2'>
+      {categories.length > 0 && (
+        <Select
+          value={categoryId}
+          onValueChange={(v) => updateParam('category_id', v === 'all' ? '' : v)}
+        >
+          <SelectTrigger className='h-8 w-full text-xs sm:w-40'>
+            <SelectValue placeholder='카테고리 전체' />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='all'>카테고리 전체</SelectItem>
+            {categories.map((cat) => (
+              <SelectItem key={cat.id} value={cat.id}>
+                <span className='flex items-center gap-1.5'>
+                  <span
+                    className='inline-block h-3 w-3 shrink-0 rounded-full'
+                    style={{ background: cat.color }}
+                  />
+                  {cat.name}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
+
       <Select
         value={priority}
         onValueChange={(v) => updateParam('priority', v === 'all' ? '' : v)}

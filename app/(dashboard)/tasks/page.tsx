@@ -1,4 +1,5 @@
 import { getTasks } from '@/lib/actions/tasks'
+import { getCategories } from '@/lib/actions/categories'
 import { TasksClient } from '@/components/tasks/tasks-client'
 
 interface TasksPageProps {
@@ -11,10 +12,13 @@ interface TasksPageProps {
 export default async function TasksPage({ searchParams }: TasksPageProps) {
   const params = await searchParams
 
-  const { data: tasks } = await getTasks({
-    category_id: params.category_id,
-    priority: params.priority,
-  })
+  const [{ data: tasks }, { data: categories }] = await Promise.all([
+    getTasks({
+      category_id: params.category_id,
+      priority: params.priority,
+    }),
+    getCategories(),
+  ])
 
-  return <TasksClient initialTasks={tasks ?? []} />
+  return <TasksClient initialTasks={tasks ?? []} categories={categories ?? []} />
 }
