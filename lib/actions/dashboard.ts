@@ -24,7 +24,7 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
 
   const today = new Date().toISOString().split('T')[0]
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
-  const weekEnd = new Date(Date.now() + 6 * 86400000).toISOString().split('T')[0]
+  const weekEndExclusive = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0]
 
   const [
     todayDueResult,
@@ -37,7 +37,8 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
     supabase
       .from('tasks')
       .select('*', { count: 'exact', head: true })
-      .eq('due_date', today)
+      .gte('due_date', today)
+      .lt('due_date', tomorrow)
       .neq('status', 'done'),
 
     supabase
@@ -60,7 +61,7 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
       .from('tasks')
       .select('*', { count: 'exact', head: true })
       .gte('due_date', today)
-      .lte('due_date', weekEnd)
+      .lt('due_date', weekEndExclusive)
       .neq('status', 'done'),
 
     supabase
