@@ -38,6 +38,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       if (signInError) throw signInError
 
       router.push('/dashboard')
+      router.refresh()
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : '회원가입 중 오류가 발생했습니다.')
     } finally {
