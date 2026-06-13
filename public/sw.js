@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tataco-v1'
+const CACHE_NAME = 'tataco-v2'
 const STATIC_ASSETS = ['/dashboard', '/tasks', '/calendar', '/settings']
 
 self.addEventListener('install', (event) => {
