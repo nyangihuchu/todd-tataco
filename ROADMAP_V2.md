@@ -25,12 +25,12 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
 
 | Phase | 설명 | 태스크 수 | 완료 | 진행률 |
 |-------|------|-----------|------|--------|
-| Phase 1 | DB 스키마 정리 및 코드 제거 | 8 | 0 | 0% |
-| Phase 2 | 핵심 기능 전환 | 6 | 0 | 0% |
+| Phase 1 | DB 스키마 정리 및 코드 제거 | 8 | 8 | ✅ 100% |
+| Phase 2 | 핵심 기능 전환 | 6 | 1 | 17% |
 | Phase 3 | 캘린더 강화 | 5 | 0 | 0% |
-| Phase 4 | 알림 시스템 1인화 | 6 | 0 | 0% |
+| Phase 4 | 알림 시스템 1인화 | 6 | 3 | 50% |
 | Phase 5 | 품질 마무리 | 4 | 0 | 0% |
-| **합계** | | **29** | **0** | **0%** |
+| **합계** | | **29** | **12** | **41%** |
 
 ---
 
@@ -45,50 +45,50 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
 기존 B2B 구조의 DB 컬럼과 관련 코드를 제거하고, 카테고리 시스템의 기반을 마련합니다.
 이 Phase가 완료되어야 이후 UI/기능 작업이 타입 안전하게 진행될 수 있습니다.
 
-- [ ] **T001**: `tasks` 상태값 정리 마이그레이션 — `대기중`
+- [x] **T001**: `tasks` 상태값 정리 마이그레이션 — `완료`
   - Supabase 마이그레이션 파일 생성: `review` 상태를 `in_progress`로 일괄 변경
   - `UPDATE tasks SET status = 'in_progress' WHERE status = 'review'` 실행
   - `tasks.status` 허용값에서 `review` 제거 (CHECK constraint 또는 코드 레벨)
   - 관련 파일: `supabase/migrations/`, `lib/supabase/database.types.ts`
   - 영향 파일: `components/calendar/monthly-calendar.tsx` (statusLabel에서 review 제거)
 
-- [ ] **T002**: `tasks.company_id` / `assignee_id` 컬럼 제거 마이그레이션 — `대기중`
+- [x] **T002**: `tasks.company_id` / `assignee_id` 컬럼 제거 마이그레이션 — `완료`
   - Supabase 마이그레이션 파일 생성: 두 컬럼 DROP
   - `notification_logs.company_id`, `notification_schedules.company_id` FK 참조도 함께 처리
   - 관련 파일: `supabase/migrations/`
 
-- [ ] **T003**: `categories` 테이블 생성 및 `tasks.category_id` 추가 마이그레이션 — `대기중`
+- [x] **T003**: `categories` 테이블 생성 및 `tasks.category_id` 추가 마이그레이션 — `완료`
   - `categories` 테이블 스키마: `id`, `user_id`, `name`, `color`, `created_at`
   - `tasks.category_id` FK 컬럼 추가 (`categories.id` 참조, nullable)
   - 관련 파일: `supabase/migrations/`
 
-- [ ] **T004**: Supabase RLS 정책 업데이트 — `대기중`
+- [x] **T004**: Supabase RLS 정책 업데이트 — `완료`
   - `categories` 테이블에 RLS 활성화
   - 정책: `user_id = auth.uid()` 기반 SELECT / INSERT / UPDATE / DELETE
   - `tasks` 테이블 정책에서 `company_id` 관련 조건 제거
   - 관련 파일: `supabase/migrations/`
 
-- [ ] **T005**: TypeScript 타입 재생성 — `대기중`
+- [x] **T005**: TypeScript 타입 재생성 — `완료`
   - Supabase MCP `generate_typescript_types` 도구로 `lib/supabase/database.types.ts` 재생성
   - `categories` 테이블 타입 추가 확인
   - `tasks` 타입에서 `company_id`, `assignee_id` 제거 확인
   - `review` 상태값 제거 확인
   - 관련 파일: `lib/supabase/database.types.ts`
 
-- [ ] **T006**: 업체 관련 파일 삭제 — `대기중`
+- [x] **T006**: 업체 관련 파일 삭제 — `완료`
   - `lib/actions/companies.ts` 삭제
   - `app/(dashboard)/companies/` 디렉토리 삭제 (라우트 + 페이지)
   - `components/companies/` 디렉토리 전체 삭제 (`company-card.tsx`, `company-form-modal.tsx`, `companies-client.tsx`, `companies-skeleton.tsx`)
   - 관련 파일: 위 목록 전체
 
-- [ ] **T007**: `lib/actions/tasks.ts` companies JOIN 쿼리 제거 — `대기중`
+- [x] **T007**: `lib/actions/tasks.ts` companies JOIN 쿼리 제거 — `완료`
   - `getTasks()` 함수에서 `.select()` 내 `companies(name)` JOIN 제거
   - `TaskWithCompany` 타입을 `TaskWithCategory`로 교체 (category 정보 포함)
   - `category_id` 기반 필터 파라미터 추가 (`company_id` 필터 제거)
   - `lib/actions/dashboard.ts`의 `getChartStats()`에서 업체별 집계 로직 제거
   - 관련 파일: `lib/actions/tasks.ts`, `lib/actions/dashboard.ts`
 
-- [ ] **T008**: 사이드바 네비게이션에서 업체 관리 메뉴 제거 — `대기중`
+- [x] **T008**: 사이드바 네비게이션에서 업체 관리 메뉴 제거 — `완료`
   - `components/dashboard/sidebar-nav.tsx`에서 `/companies` 항목 제거 (`Building2` 아이콘 포함)
   - `components/dashboard/bottom-nav.tsx`에서도 업체 메뉴 제거
   - 설정 페이지(`/settings`) 메뉴 항목 추가 (`Settings` 아이콘)
@@ -141,7 +141,7 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
   - 카테고리 색상 선택기 (미리 정의된 색상 팔레트 제공)
   - 관련 파일: `app/(dashboard)/settings/page.tsx` (신규), `lib/actions/categories.ts`
 
-- [ ] **T014**: 업무 카드 및 상세 시트 UI 업데이트 — `대기중`
+- [x] **T014**: 업무 카드 및 상세 시트 UI 업데이트 — `완료`
   - `components/tasks/task-card.tsx`: 업체명 제거, 카테고리 뱃지 추가
   - `components/tasks/task-detail-sheet.tsx`: 업체/담당자 필드 제거, 카테고리 표시 추가
   - `review` 상태 관련 UI 요소 전체 제거 (뱃지 색상 정의, 상태 선택 옵션 등)
@@ -197,19 +197,19 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
 
 업체 단위로 분산되던 카카오 알림톡 발송 대상을 사용자 본인의 전화번호로 단일화합니다.
 
-- [ ] **T020**: `/api/cron/daily-notify` 발송 대상 변경 — `대기중`
+- [x] **T020**: `/api/cron/daily-notify` 발송 대상 변경 — `완료`
   - 기존: companies 테이블 기반 다건 발송
   - 변경: `profiles.phone` 기반 단건 발송 (로그인된 모든 사용자 대상)
   - `sendKakaoNotificationBulk()` → `sendKakaoNotification()` 단건으로 교체 또는 profiles 순회로 변경
   - 관련 파일: `app/api/cron/daily-notify/route.ts`
 
-- [ ] **T021**: `/api/notify/task` 발송 대상 변경 — `대기중`
+- [x] **T021**: `/api/notify/task` 발송 대상 변경 — `완료`
   - 기존: task의 company.phone으로 발송
   - 변경: `profiles.phone` (업무 생성자 본인 번호)로 발송
   - `createClient()` → 사용자 세션 기반으로 `profiles.phone` 조회
   - 관련 파일: `app/api/notify/task/route.ts`, `lib/actions/notifications.ts`
 
-- [ ] **T022**: `notification_logs` company_id 참조 제거 — `대기중`
+- [x] **T022**: `notification_logs` company_id 참조 제거 — `완료`
   - Supabase 마이그레이션: `notification_logs.company_id` 컬럼 DROP
   - `notification_schedules.company_id` 컬럼 DROP
   - `lib/supabase/database.types.ts` 타입 재생성 반영
