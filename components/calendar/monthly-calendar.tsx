@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 import type { TaskWithCategory } from '@/lib/actions/tasks'
+import type { Category } from '@/lib/actions/categories'
 
 const DAYS_OF_WEEK = ['일', '월', '화', '수', '목', '금', '토']
 
@@ -57,9 +58,15 @@ function getStatusLabel(status: string): string {
 
 interface MonthlyCalendarProps {
   tasks?: TaskWithCategory[]
+  categories?: Category[]
+  selectedCategoryId?: string
 }
 
-export function MonthlyCalendar({ tasks = [] }: MonthlyCalendarProps) {
+export function MonthlyCalendar({
+  tasks = [],
+  categories: _categories = [],
+  selectedCategoryId = '',
+}: MonthlyCalendarProps) {
   const now = new Date()
   const [year, setYear] = useState(now.getFullYear())
   const [month, setMonth] = useState(now.getMonth())
@@ -77,7 +84,11 @@ export function MonthlyCalendar({ tasks = [] }: MonthlyCalendarProps) {
 
   function getTasksForDay(day: number): TaskWithCategory[] {
     const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-    return tasks.filter((t) => t.due_date?.startsWith(dateStr))
+    return tasks.filter((t) => {
+      if (!t.due_date?.startsWith(dateStr)) return false
+      if (selectedCategoryId && t.category_id !== selectedCategoryId) return false
+      return true
+    })
   }
 
   function prevMonth() {
@@ -153,8 +164,14 @@ export function MonthlyCalendar({ tasks = [] }: MonthlyCalendarProps) {
                         <span
                           className={cn(
                             'h-1.5 w-1.5 shrink-0 rounded-full',
-                            getPriorityDotColor(task.priority),
+                            !task.category_color &&
+                              getPriorityDotColor(task.priority),
                           )}
+                          style={
+                            task.category_color
+                              ? { background: task.category_color }
+                              : undefined
+                          }
                         />
                         <span className='truncate text-xs'>{task.title}</span>
                       </div>
@@ -177,7 +194,15 @@ export function MonthlyCalendar({ tasks = [] }: MonthlyCalendarProps) {
                       <div key={task.id} className='rounded-md border p-2 space-y-1'>
                         <p className='text-sm font-medium'>{task.title}</p>
                         {task.category_name && (
-                          <p className='text-xs text-muted-foreground'>{task.category_name}</p>
+                          <p className='flex items-center gap-1 text-xs text-muted-foreground'>
+                            {task.category_color && (
+                              <span
+                                className='inline-block h-2.5 w-2.5 shrink-0 rounded-full'
+                                style={{ background: task.category_color }}
+                              />
+                            )}
+                            {task.category_name}
+                          </p>
                         )}
                         <div className='flex gap-1'>
                           <Badge

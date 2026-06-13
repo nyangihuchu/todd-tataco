@@ -27,10 +27,10 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
 |-------|------|-----------|------|--------|
 | Phase 1 | DB 스키마 정리 및 코드 제거 | 8 | 8 | ✅ 100% |
 | Phase 2 | 핵심 기능 전환 | 6 | 6 | ✅ 100% |
-| Phase 3 | 캘린더 강화 | 5 | 0 | 0% |
+| Phase 3 | 캘린더 강화 | 5 | 5 | ✅ 100% |
 | Phase 4 | 알림 시스템 1인화 | 6 | 3 | 50% |
 | Phase 5 | 품질 마무리 | 4 | 0 | 0% |
-| **합계** | | **29** | **17** | **59%** |
+| **합계** | | **29** | **22** | **76%** |
 
 ---
 
@@ -156,34 +156,34 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
 월간 뷰만 존재하던 캘린더를 주간/일간 뷰까지 지원하는 풀 캘린더로 확장합니다.
 업체 필터를 카테고리 필터로 교체합니다.
 
-- [ ] **T015**: 캘린더 페이지 뷰 전환 탭 UI 추가 — `대기중`
+- [x] **T015**: 캘린더 페이지 뷰 전환 탭 UI 추가 — `완료`
   - `app/(dashboard)/calendar/page.tsx`에 뷰 상태 관리 추가 (`monthly` / `weekly` / `daily`)
   - 탭 컴포넌트(`shadcn Tabs`) 또는 토글 버튼으로 뷰 전환 UI 구현
   - 각 뷰에 대응하는 컴포넌트 조건부 렌더링 구조 작성
   - 관련 파일: `app/(dashboard)/calendar/page.tsx`
 
-- [ ] **T016**: 주간 뷰 컴포넌트 구현 — `대기중`
+- [x] **T016**: 주간 뷰 컴포넌트 구현 — `완료`
   - `components/calendar/weekly-calendar.tsx` 신규 생성
   - 7일 컬럼 레이아웃 (현재 주 기준, 이전/다음 주 네비게이션)
   - 각 날짜 컬럼에 해당 날짜 마감 업무 카드 표시
   - 카테고리 뱃지 및 우선순위 색상 반영
   - 관련 파일: `components/calendar/weekly-calendar.tsx` (신규)
 
-- [ ] **T017**: 일간 뷰 컴포넌트 구현 — `대기중`
+- [x] **T017**: 일간 뷰 컴포넌트 구현 — `완료`
   - `components/calendar/daily-calendar.tsx` 신규 생성
   - 선택한 날짜의 업무 목록 표시 (마감일 기준)
   - 빠른 업무 추가 버튼 (해당 날짜를 due_date로 선택한 상태로 폼 모달 오픈)
   - 업무 완료 상태 토글 인라인 지원
   - 관련 파일: `components/calendar/daily-calendar.tsx` (신규)
 
-- [ ] **T018**: 캘린더 업체 필터 → 카테고리 필터 교체 — `대기중`
+- [x] **T018**: 캘린더 업체 필터 → 카테고리 필터 교체 — `완료`
   - `components/calendar/monthly-calendar.tsx`에서 `companies` prop 및 업체 필터 UI 제거
   - `categories` prop 추가, 카테고리 기반 필터 토글 버튼 UI로 교체
   - `getTasksForDay()` 필터 로직을 `company_id` → `category_id` 기준으로 변경
   - 주간/일간 뷰 컴포넌트에도 동일한 카테고리 필터 props 전달
   - 관련 파일: `components/calendar/monthly-calendar.tsx`, `app/(dashboard)/calendar/page.tsx`
 
-- [ ] **T019**: 월간 캘린더 카테고리 색상 뱃지 반영 — `대기중`
+- [x] **T019**: 월간 캘린더 카테고리 색상 뱃지 반영 — `완료`
   - 날짜 셀의 업무 항목에 카테고리 색상 도트 표시 (기존 priority 도트 보완 또는 교체)
   - Popover 상세 뷰에 카테고리 뱃지 추가 (`category.color` 기반 인라인 스타일)
   - 카테고리 미지정 업무는 기본 회색 처리
