@@ -28,23 +28,11 @@ async function AuthenticatedLayout({ children }: { children: React.ReactNode }) 
   const userEmail = user.email ?? ''
   const uid = user.id
 
-  const [{ data: company }, { data: profile }] = await Promise.all([
-    supabase
-      .from('companies')
-      .select('contact_name')
-      .or(`user_id.eq.${uid},created_by.eq.${uid}`)
-      .limit(1)
-      .maybeSingle(),
-    supabase
-      .from('profiles')
-      .select('display_name')
-      .eq('id', uid)
-      .single(),
-  ])
-
-  if (!company?.contact_name) {
-    redirect('/onboarding')
-  }
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('display_name')
+    .eq('id', uid)
+    .single()
 
   const displayName = profile?.display_name ?? null
 

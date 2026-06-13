@@ -27,16 +27,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
 
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('사용자 정보를 가져올 수 없습니다.')
-
-      const { data: company } = await supabase
-        .from('companies')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
-
-      router.push(company ? '/dashboard' : '/onboarding')
+      router.push('/dashboard')
     } catch (error: unknown) {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.')
     } finally {

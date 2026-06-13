@@ -1,5 +1,5 @@
 const CACHE_NAME = 'tataco-v1'
-const STATIC_ASSETS = ['/dashboard', '/companies', '/tasks', '/calendar']
+const STATIC_ASSETS = ['/dashboard', '/tasks', '/calendar', '/settings']
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
