@@ -115,10 +115,10 @@ export function ClientsClient({ initialClients }: ClientsClientProps) {
                     <Button
                       variant='ghost'
                       size='icon'
-                      className='h-7 w-7 shrink-0'
+                      className='h-9 w-9 shrink-0'
                       disabled={isPending}
                     >
-                      <MoreHorizontal size={16} />
+                      <MoreHorizontal size={18} />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align='end'>
@@ -135,31 +135,37 @@ export function ClientsClient({ initialClients }: ClientsClientProps) {
                 </DropdownMenu>
               </div>
 
-              <div className='flex flex-col gap-1.5 text-sm text-muted-foreground'>
+              <div className='flex flex-col gap-2 text-sm text-muted-foreground'>
                 {client.phone && (
-                  <div className='flex items-center gap-2'>
+                  <a
+                    href={`tel:${client.phone}`}
+                    className='flex min-h-[36px] items-center gap-2 rounded-md px-1 transition-colors active:bg-accent'
+                  >
                     <Phone size={13} className='shrink-0' />
                     <span className='truncate'>{client.phone}</span>
-                  </div>
+                  </a>
                 )}
                 {client.email && (
-                  <div className='flex items-center gap-2'>
+                  <a
+                    href={`mailto:${client.email}`}
+                    className='flex min-h-[36px] items-center gap-2 rounded-md px-1 transition-colors active:bg-accent'
+                  >
                     <Mail size={13} className='shrink-0' />
                     <span className='truncate'>{client.email}</span>
-                  </div>
+                  </a>
                 )}
                 {client.website_url && (
-                  <div className='flex items-center gap-2'>
+                  <a
+                    href={client.website_url}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='flex min-h-[36px] items-center gap-2 rounded-md px-1 transition-colors active:bg-accent'
+                  >
                     <Globe size={13} className='shrink-0' />
-                    <a
-                      href={client.website_url}
-                      target='_blank'
-                      rel='noopener noreferrer'
-                      className='truncate hover:text-foreground hover:underline'
-                    >
+                    <span className='truncate'>
                       {client.website_url.replace(/^https?:\/\//, '')}
-                    </a>
-                  </div>
+                    </span>
+                  </a>
                 )}
               </div>
             </div>

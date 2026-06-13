@@ -7,11 +7,12 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 import { ImagePlus, X } from 'lucide-react'
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -186,13 +187,14 @@ export function ClientFormModal({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-md'>
-        <DialogHeader>
-          <DialogTitle>{isEdit ? '거래처 수정' : '거래처 추가'}</DialogTitle>
-        </DialogHeader>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side='right' className='flex w-full flex-col gap-0 sm:max-w-md'>
+        <SheetHeader className='border-b px-4 py-3'>
+          <SheetTitle>{isEdit ? '거래처 수정' : '거래처 추가'}</SheetTitle>
+        </SheetHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
+        <form onSubmit={handleSubmit(onSubmit)} className='flex flex-1 flex-col overflow-y-auto'>
+          <div className='flex flex-col gap-4 px-4 py-4'>
           <div className='flex flex-col items-center gap-2'>
             <div className='relative'>
               {imagePreview ? (
@@ -205,16 +207,16 @@ export function ClientFormModal({
                   <button
                     type='button'
                     onClick={handleRemoveImage}
-                    className='absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-destructive-foreground'
+                    className='absolute -right-1 -top-1 flex h-7 w-7 items-center justify-center rounded-full bg-destructive text-destructive-foreground'
                   >
-                    <X size={12} />
+                    <X size={14} />
                   </button>
                 </>
               ) : (
                 <button
                   type='button'
                   onClick={() => fileInputRef.current?.click()}
-                  className='flex h-20 w-20 flex-col items-center justify-center gap-1 rounded-full border-2 border-dashed border-muted-foreground/40 text-muted-foreground transition-colors hover:border-primary hover:text-primary'
+                  className='flex h-20 w-20 flex-col items-center justify-center gap-1 rounded-full border-2 border-dashed border-muted-foreground/40 text-muted-foreground transition-colors active:border-primary active:text-primary'
                 >
                   <ImagePlus size={20} />
                   <span className='text-xs'>사진</span>
@@ -225,7 +227,7 @@ export function ClientFormModal({
               <button
                 type='button'
                 onClick={() => fileInputRef.current?.click()}
-                className='text-xs text-muted-foreground underline'
+                className='min-h-[36px] px-3 text-xs text-muted-foreground underline'
               >
                 이미지 변경
               </button>
@@ -260,6 +262,8 @@ export function ClientFormModal({
             <Label htmlFor='phone'>연락처</Label>
             <Input
               id='phone'
+              type='tel'
+              inputMode='tel'
               {...register('phone')}
               placeholder='010-0000-0000'
             />
@@ -270,6 +274,7 @@ export function ClientFormModal({
             <Input
               id='email'
               type='email'
+              inputMode='email'
               {...register('email')}
               placeholder='example@email.com'
             />
@@ -282,6 +287,8 @@ export function ClientFormModal({
             <Label htmlFor='website_url'>웹사이트</Label>
             <Input
               id='website_url'
+              type='url'
+              inputMode='url'
               {...register('website_url')}
               placeholder='https://example.com'
             />
@@ -289,8 +296,9 @@ export function ClientFormModal({
               <p className='text-xs text-destructive'>{errors.website_url.message}</p>
             )}
           </div>
+        </div>
 
-          <div className='flex gap-2 pt-2'>
+        <SheetFooter className='border-t px-4 py-3'>
             <Button
               type='button'
               variant='outline'
@@ -309,9 +317,9 @@ export function ClientFormModal({
                   ? '저장'
                   : '등록'}
             </Button>
-          </div>
+          </SheetFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   )
 }
