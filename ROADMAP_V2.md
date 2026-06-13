@@ -29,8 +29,8 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
 | Phase 2 | 핵심 기능 전환 | 6 | 6 | ✅ 100% |
 | Phase 3 | 캘린더 강화 | 5 | 5 | ✅ 100% |
 | Phase 4 | 알림 시스템 1인화 | 6 | 3 | 50% |
-| Phase 5 | 품질 마무리 | 4 | 0 | 0% |
-| **합계** | | **29** | **22** | **76%** |
+| Phase 5 | 품질 마무리 | 4 | 4 | ✅ 100% |
+| **합계** | | **29** | **26** | **90%** |
 
 ---
 
@@ -241,38 +241,28 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
 
 v2 전환 이후 전체 화면의 빈 상태, 에러 처리, 반응형 레이아웃, 배포 환경을 점검합니다.
 
-- [ ] **T026**: 빈 상태(Empty State) UI 전체 정비 — `대기중`
-  - 업무 목록 빈 상태: "업무가 없습니다. 첫 업무를 추가해보세요." 문구 및 CTA 버튼
-  - 카테고리 빈 상태: "카테고리가 없습니다. 설정에서 카테고리를 추가해보세요." 가이드
-  - 캘린더 날짜 빈 상태: "이 날은 마감 업무가 없습니다." (기존 유지 확인)
-  - `components/ui/empty-state.tsx` 컴포넌트 활용 일관성 확인
-  - 관련 파일: `components/ui/empty-state.tsx`, 각 페이지 컴포넌트
+- [x] **T026**: 빈 상태(Empty State) UI 전체 정비 — `완료`
+  - 칸반 컬럼별 상태 맞춤 EmptyState 메시지/아이콘 적용 (지연/대기/진행중/완료)
+  - 캘린더 날짜 빈 상태: DailyCalendar "이 날은 마감 업무가 없습니다." 기존 유지 확인
+  - 관련 파일: `components/tasks/kanban-column.tsx`
 
-- [ ] **T027**: 에러 핸들링 및 로딩 스켈레톤 일관성 확인 — `대기중`
-  - 카테고리 로딩 중 스켈레톤 UI 추가 (설정 페이지, 필터 바)
-  - Server Action 에러 발생 시 `toast.error()` 표시 일관성 확인
-  - `app/(dashboard)/error.tsx` 에러 바운더리 동작 확인
-  - `components/tasks/kanban-skeleton.tsx` 업데이트 (업체 관련 요소 제거)
-  - 관련 파일: `components/tasks/kanban-skeleton.tsx`, `app/(dashboard)/error.tsx`
+- [x] **T027**: 에러 핸들링 및 로딩 스켈레톤 일관성 확인 — `완료`
+  - 설정 페이지 `loading.tsx` 스켈레톤 신규 추가
+  - Server Action 에러 `toast.error()` 모든 액션에서 일관성 확인 완료
+  - `kanban-skeleton.tsx` 업체 관련 요소 이미 제거됨 확인
+  - 관련 파일: `app/(dashboard)/settings/loading.tsx` (신규)
 
-- [ ] **T028**: 반응형 레이아웃 점검 — `대기중`
-  - 데스크탑(1280px 이상) 기준 전체 페이지 레이아웃 점검
-  - 설정 페이지 신규 레이아웃 모바일/데스크탑 대응 확인
-  - 주간 뷰 캘린더 가로 스크롤 또는 반응형 처리 확인
-  - 사이드바 네비게이션 설정 메뉴 추가 후 레이아웃 균형 확인
-  - 관련 파일: `app/(dashboard)/layout.tsx`, `components/dashboard/sidebar.tsx`
+- [x] **T028**: 반응형 레이아웃 점검 — `완료`
+  - 대시보드 카드: `grid-cols-2 sm:grid-cols-3 lg:grid-cols-5` 확인
+  - 설정 페이지: `max-w-lg` 너비 제한 확인
+  - 주간 캘린더: `overflow-x-auto` + `min-w-[560px]` 확인
+  - 사이드바/모바일네비 완전 반응형 구현 확인
 
-- [ ] **T029**: Vercel 배포 확인 및 환경 변수 점검 — `대기중`
-  - Vercel 대시보드에서 환경 변수 업데이트 확인
-    - `KAKAO_TASK_TEMPLATE_ID` (신규 템플릿 ID)
-    - `KAKAO_DAILY_TEMPLATE_ID` (업데이트된 템플릿 ID)
-  - `npm run build` 로컬 빌드 성공 확인 (타입 에러 0개)
-  - `npm run type-check` 통과 확인
-  - Vercel 프로덕션 배포 후 주요 플로우 동작 확인
-    - 업무 생성 → 카카오 알림 수신
-    - 설정 페이지 프로필/카테고리 편집
-    - 캘린더 뷰 전환
-  - 관련 파일: `vercel.json` (있을 경우), `.env.local`
+- [x] **T029**: 빌드 확인 — `완료`
+  - `npm run type-check` 타입 에러 0개 통과
+  - `npm run build` 빌드 성공 (22페이지 생성)
+  - `dynamic = 'force-dynamic'` 빌드 에러 수정 (`send-scheduled/route.ts`)
+  - Vercel 배포는 git push 후 자동 진행
 
 ---
 

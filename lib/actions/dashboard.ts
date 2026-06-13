@@ -22,9 +22,15 @@ export type DashboardStats = {
 export async function getDashboardStats(): Promise<ActionResult<DashboardStats>> {
   const supabase = await createClient()
 
-  const today = new Date().toISOString().split('T')[0]
+  const now = new Date()
+  const today = now.toISOString().split('T')[0]
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0]
-  const weekEndExclusive = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0]
+
+  // 이번 주 월요일 ~ 다음 월요일 (일요일=0 처리 포함)
+  const dayOfWeek = now.getDay()
+  const daysFromMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1
+  const weekMonday = new Date(Date.now() - daysFromMonday * 86400000).toISOString().split('T')[0]
+  const nextMonday = new Date(Date.now() + (7 - daysFromMonday) * 86400000).toISOString().split('T')[0]
 
   const [
     todayDueResult,
@@ -60,8 +66,8 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
     supabase
       .from('tasks')
       .select('*', { count: 'exact', head: true })
-      .gte('due_date', today)
-      .lt('due_date', weekEndExclusive)
+      .gte('due_date', weekMonday)
+      .lt('due_date', nextMonday)
       .neq('status', 'done'),
 
     supabase

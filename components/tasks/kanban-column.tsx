@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
+import type { ReactNode } from 'react'
 import { useDroppable } from '@dnd-kit/core'
-import { ChevronDown, ChevronRight, ClipboardList } from 'lucide-react'
+import { ChevronDown, ChevronRight, CheckCircle2, ClipboardList, Loader2, AlertCircle } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { EmptyState } from '@/components/ui/empty-state'
 import { cn } from '@/lib/utils'
@@ -42,6 +43,27 @@ const columnConfig: Record<
     overClass: 'ring-2 ring-emerald-300',
     dotClass: 'bg-emerald-500',
     labelClass: 'text-emerald-700 dark:text-emerald-400',
+  },
+}
+
+const emptyStateConfig: Record<Status, { icon: ReactNode; title: string; description?: string }> = {
+  overdue: {
+    icon: <AlertCircle size={24} />,
+    title: '지연된 업무 없음',
+    description: '기한을 초과한 업무가 없습니다.',
+  },
+  pending: {
+    icon: <ClipboardList size={24} />,
+    title: '할 일 없음',
+    description: '새 업무를 추가해보세요.',
+  },
+  in_progress: {
+    icon: <Loader2 size={24} />,
+    title: '진행 중인 업무 없음',
+  },
+  done: {
+    icon: <CheckCircle2 size={24} />,
+    title: '완료된 업무 없음',
   },
 }
 
@@ -118,8 +140,9 @@ export function KanbanColumn({
         ))}
         {tasks.length === 0 && (
           <EmptyState
-            icon={<ClipboardList size={24} />}
-            title='업무 없음'
+            icon={emptyStateConfig[status].icon}
+            title={emptyStateConfig[status].title}
+            description={emptyStateConfig[status].description}
           />
         )}
       </div>
