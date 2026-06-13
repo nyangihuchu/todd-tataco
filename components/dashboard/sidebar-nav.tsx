@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, ClipboardList, CalendarDays, Settings } from 'lucide-react'
+import { LayoutDashboard, ClipboardList, CalendarDays, Building2, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/dashboard', label: '대시보드', icon: LayoutDashboard },
   { href: '/tasks', label: '업무 관리', icon: ClipboardList },
   { href: '/calendar', label: '캘린더', icon: CalendarDays },
+  { href: '/clients', label: '거래처', icon: Building2 },
   { href: '/settings', label: '설정', icon: Settings },
 ]
 

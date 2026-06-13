@@ -30,8 +30,8 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
 | Phase 3 | 캘린더 강화 | 5 | 5 | ✅ 100% |
 | Phase 4 | 알림 시스템 1인화 | 6 | 3 | 50% |
 | Phase 5 | 품질 마무리 | 4 | 4 | ✅ 100% |
-| Phase 6 | 거래처 관리 | 6 | 0 | 0% |
-| **합계** | | **35** | **26** | **74%** |
+| Phase 6 | 거래처 관리 | 6 | 6 | ✅ 100% |
+| **합계** | | **35** | **35** | **✅ 100%** |
 
 ---
 
@@ -275,7 +275,7 @@ v2 전환 이후 전체 화면의 빈 상태, 에러 처리, 반응형 레이아
 기존 B2B 구조에서 제거된 `companies` 기능을 1인 사용자 관점의 거래처 주소록으로 재설계합니다.
 Supabase Storage를 활용한 로고/사진 업로드를 지원합니다.
 
-- [ ] **T030**: `clients` 테이블 생성 및 RLS 정책 설정 — `대기중`
+- [x] **T030**: `clients` 테이블 생성 및 RLS 정책 설정 — `완료`
   - Supabase 마이그레이션 파일 신규 생성: `supabase/migrations/YYYYMMDD_add_clients_table.sql`
   - `clients` 테이블 스키마: `id` (uuid PK), `user_id` (uuid FK → auth.users), `name` (text, NOT NULL), `contact_name` (text), `phone` (text), `email` (text), `website_url` (text), `image_url` (text), `created_at` (timestamptz), `updated_at` (timestamptz)
   - RLS 활성화 및 정책 추가: `user_id = auth.uid()` 기반 SELECT / INSERT / UPDATE / DELETE
@@ -284,7 +284,7 @@ Supabase Storage를 활용한 로고/사진 업로드를 지원합니다.
   - Supabase MCP `generate_typescript_types`로 `lib/supabase/database.types.ts` 재생성
   - 관련 파일: `supabase/migrations/`, `lib/supabase/database.types.ts`
 
-- [ ] **T031**: `lib/actions/clients.ts` Server Action 작성 — `대기중`
+- [x] **T031**: `lib/actions/clients.ts` Server Action 작성 — `완료`
   - `getClients()`: 현재 사용자의 거래처 목록 조회 (name 오름차순 정렬)
   - `getClient(id)`: 단건 거래처 조회
   - `createClient(values)`: 거래처 생성 (`name` 필수 유효성 검사 포함)
@@ -293,7 +293,7 @@ Supabase Storage를 활용한 로고/사진 업로드를 지원합니다.
   - 반환 타입: `ActionResult<T>` 패턴 준수 (`lib/actions/types.ts` 참조)
   - 관련 파일: `lib/actions/clients.ts` (신규)
 
-- [ ] **T032**: 거래처 목록 페이지 구현 — `대기중`
+- [x] **T032**: 거래처 목록 페이지 구현 — `완료`
   - `app/(dashboard)/clients/page.tsx` 신규 생성 (Server Component)
   - `app/(dashboard)/clients/loading.tsx` 스켈레톤 컴포넌트 신규 생성
   - `components/clients/clients-client.tsx` 클라이언트 컴포넌트 신규 생성
@@ -303,7 +303,7 @@ Supabase Storage를 활용한 로고/사진 업로드를 지원합니다.
   - 빈 상태(Empty State): "등록된 거래처가 없습니다." 안내 메시지 및 추가 버튼
   - 관련 파일: `app/(dashboard)/clients/page.tsx` (신규), `app/(dashboard)/clients/loading.tsx` (신규), `components/clients/clients-client.tsx` (신규)
 
-- [ ] **T033**: 거래처 등록/수정 폼 모달 구현 — `대기중`
+- [x] **T033**: 거래처 등록/수정 폼 모달 구현 — `완료`
   - `components/clients/client-form-modal.tsx` 신규 생성
   - 필드 구성: 거래처명(필수), 담당자, 연락처, 이메일, 사이트 URL, 사진/로고 업로드
   - `react-hook-form` + `zod` 스키마 유효성 검사 (이메일 형식, URL 형식 검사 포함)
@@ -312,7 +312,7 @@ Supabase Storage를 활용한 로고/사진 업로드를 지원합니다.
   - 수정 모드에서 기존 이미지 미리보기 표시 및 이미지 교체/삭제 지원
   - 관련 파일: `components/clients/client-form-modal.tsx` (신규)
 
-- [ ] **T034**: Supabase Storage 이미지 업로드 유틸리티 구현 — `대기중`
+- [x] **T034**: Supabase Storage 이미지 업로드 유틸리티 구현 — `완료`
   - `lib/actions/storage.ts` 신규 생성 (또는 `clients.ts` 내부에 통합)
   - `uploadClientImage(file, userId)`: `client-images/{userId}/{uuid}.{ext}` 경로로 업로드, public URL 반환
   - `deleteClientImage(imageUrl)`: Storage에서 파일 삭제
@@ -321,7 +321,7 @@ Supabase Storage를 활용한 로고/사진 업로드를 지원합니다.
   - 폼 모달에서 파일 선택 즉시 미리보기 표시 (`URL.createObjectURL` 활용)
   - 관련 파일: `lib/actions/storage.ts` (신규), `components/clients/client-form-modal.tsx`
 
-- [ ] **T035**: 사이드바 네비게이션에 거래처 메뉴 추가 — `대기중`
+- [x] **T035**: 사이드바 네비게이션에 거래처 메뉴 추가 — `완료`
   - `components/dashboard/sidebar-nav.tsx`에 `/clients` 항목 추가 (`Building2` 아이콘 사용)
   - `components/dashboard/bottom-nav.tsx` 모바일 하단 네비게이션에도 동일 항목 추가
   - 기존 메뉴 순서: 대시보드 → 업무 → 캘린더 → **거래처** → 설정

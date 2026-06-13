@@ -46,6 +46,45 @@ export type Database = {
           },
         ]
       }
+      clients: {
+        Row: {
+          contact_name: string | null
+          created_at: string
+          email: string | null
+          id: string
+          image_url: string | null
+          name: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+          website_url: string | null
+        }
+        Insert: {
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+          website_url?: string | null
+        }
+        Update: {
+          contact_name?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       comments: {
         Row: {
           author_id: string | null
