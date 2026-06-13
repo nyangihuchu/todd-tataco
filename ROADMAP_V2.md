@@ -30,7 +30,8 @@ TATACO v2는 기존 업체 중심의 B2B 협업 구조를 걷어내고, **혼자
 | Phase 3 | 캘린더 강화 | 5 | 5 | ✅ 100% |
 | Phase 4 | 알림 시스템 1인화 | 6 | 3 | 50% |
 | Phase 5 | 품질 마무리 | 4 | 4 | ✅ 100% |
-| **합계** | | **29** | **26** | **90%** |
+| Phase 6 | 거래처 관리 | 6 | 0 | 0% |
+| **합계** | | **35** | **26** | **74%** |
 
 ---
 
@@ -266,6 +267,68 @@ v2 전환 이후 전체 화면의 빈 상태, 에러 처리, 반응형 레이아
 
 ---
 
+### Phase 6 — 거래처 관리
+
+> 예상 소요 기간: 2~3일
+
+거래처(클라이언트/비즈니스 파트너) 정보를 등록하고 관리하는 섹션을 신규 추가합니다.
+기존 B2B 구조에서 제거된 `companies` 기능을 1인 사용자 관점의 거래처 주소록으로 재설계합니다.
+Supabase Storage를 활용한 로고/사진 업로드를 지원합니다.
+
+- [ ] **T030**: `clients` 테이블 생성 및 RLS 정책 설정 — `대기중`
+  - Supabase 마이그레이션 파일 신규 생성: `supabase/migrations/YYYYMMDD_add_clients_table.sql`
+  - `clients` 테이블 스키마: `id` (uuid PK), `user_id` (uuid FK → auth.users), `name` (text, NOT NULL), `contact_name` (text), `phone` (text), `email` (text), `website_url` (text), `image_url` (text), `created_at` (timestamptz), `updated_at` (timestamptz)
+  - RLS 활성화 및 정책 추가: `user_id = auth.uid()` 기반 SELECT / INSERT / UPDATE / DELETE
+  - Supabase Storage `client-images` 버킷 생성 (public 버킷, 파일 크기 제한 2MB)
+  - Storage RLS 정책: 인증 사용자 본인 소유 파일만 업로드/삭제 허용
+  - Supabase MCP `generate_typescript_types`로 `lib/supabase/database.types.ts` 재생성
+  - 관련 파일: `supabase/migrations/`, `lib/supabase/database.types.ts`
+
+- [ ] **T031**: `lib/actions/clients.ts` Server Action 작성 — `대기중`
+  - `getClients()`: 현재 사용자의 거래처 목록 조회 (name 오름차순 정렬)
+  - `getClient(id)`: 단건 거래처 조회
+  - `createClient(values)`: 거래처 생성 (`name` 필수 유효성 검사 포함)
+  - `updateClient(id, values)`: 거래처 수정 (본인 소유 여부 확인)
+  - `deleteClient(id)`: 거래처 삭제 (본인 소유 여부 확인, Storage 이미지도 함께 삭제)
+  - 반환 타입: `ActionResult<T>` 패턴 준수 (`lib/actions/types.ts` 참조)
+  - 관련 파일: `lib/actions/clients.ts` (신규)
+
+- [ ] **T032**: 거래처 목록 페이지 구현 — `대기중`
+  - `app/(dashboard)/clients/page.tsx` 신규 생성 (Server Component)
+  - `app/(dashboard)/clients/loading.tsx` 스켈레톤 컴포넌트 신규 생성
+  - `components/clients/clients-client.tsx` 클라이언트 컴포넌트 신규 생성
+  - 카드 그리드 레이아웃: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`
+  - 각 카드에 로고 이미지(없을 경우 이니셜 폴백 Avatar), 거래처명, 담당자, 연락처, 이메일, 사이트 URL 표시
+  - 우상단 "거래처 추가" 버튼으로 등록 모달 오픈
+  - 빈 상태(Empty State): "등록된 거래처가 없습니다." 안내 메시지 및 추가 버튼
+  - 관련 파일: `app/(dashboard)/clients/page.tsx` (신규), `app/(dashboard)/clients/loading.tsx` (신규), `components/clients/clients-client.tsx` (신규)
+
+- [ ] **T033**: 거래처 등록/수정 폼 모달 구현 — `대기중`
+  - `components/clients/client-form-modal.tsx` 신규 생성
+  - 필드 구성: 거래처명(필수), 담당자, 연락처, 이메일, 사이트 URL, 사진/로고 업로드
+  - `react-hook-form` + `zod` 스키마 유효성 검사 (이메일 형식, URL 형식 검사 포함)
+  - 등록 모드(create) / 수정 모드(update) 분기 처리 (`clientId` prop 유무로 판단)
+  - 저장 성공 시 `toast.success()`, 실패 시 `toast.error()` 표시
+  - 수정 모드에서 기존 이미지 미리보기 표시 및 이미지 교체/삭제 지원
+  - 관련 파일: `components/clients/client-form-modal.tsx` (신규)
+
+- [ ] **T034**: Supabase Storage 이미지 업로드 유틸리티 구현 — `대기중`
+  - `lib/actions/storage.ts` 신규 생성 (또는 `clients.ts` 내부에 통합)
+  - `uploadClientImage(file, userId)`: `client-images/{userId}/{uuid}.{ext}` 경로로 업로드, public URL 반환
+  - `deleteClientImage(imageUrl)`: Storage에서 파일 삭제
+  - 파일 타입 검사: `image/jpeg`, `image/png`, `image/webp`만 허용
+  - 파일 크기 검사: 2MB 초과 시 에러 반환
+  - 폼 모달에서 파일 선택 즉시 미리보기 표시 (`URL.createObjectURL` 활용)
+  - 관련 파일: `lib/actions/storage.ts` (신규), `components/clients/client-form-modal.tsx`
+
+- [ ] **T035**: 사이드바 네비게이션에 거래처 메뉴 추가 — `대기중`
+  - `components/dashboard/sidebar-nav.tsx`에 `/clients` 항목 추가 (`Building2` 아이콘 사용)
+  - `components/dashboard/bottom-nav.tsx` 모바일 하단 네비게이션에도 동일 항목 추가
+  - 기존 메뉴 순서: 대시보드 → 업무 → 캘린더 → **거래처** → 설정
+  - 관련 파일: `components/dashboard/sidebar-nav.tsx`, `components/dashboard/bottom-nav.tsx`
+
+---
+
 ## 개발 워크플로우
 
 ### 작업 순서 원칙
@@ -305,13 +368,21 @@ v2 전환 이후 전체 화면의 빈 상태, 에러 처리, 반응형 레이아
 | `components/calendar/weekly-calendar.tsx` | 주간 뷰 컴포넌트 |
 | `components/calendar/daily-calendar.tsx` | 일간 뷰 컴포넌트 |
 | `supabase/migrations/YYYYMMDD_v2_schema.sql` | v2 스키마 마이그레이션 |
+| `supabase/migrations/YYYYMMDD_add_clients_table.sql` | clients 테이블 마이그레이션 (Phase 6) |
+| `lib/actions/clients.ts` | 거래처 CRUD Action (Phase 6) |
+| `lib/actions/storage.ts` | Storage 이미지 업로드 유틸리티 (Phase 6) |
+| `app/(dashboard)/clients/page.tsx` | 거래처 목록 페이지 (Phase 6) |
+| `app/(dashboard)/clients/loading.tsx` | 거래처 목록 스켈레톤 (Phase 6) |
+| `components/clients/clients-client.tsx` | 거래처 목록 클라이언트 컴포넌트 (Phase 6) |
+| `components/clients/client-form-modal.tsx` | 거래처 등록/수정 폼 모달 (Phase 6) |
 
 | 주요 수정 파일 | 변경 내용 |
 |--------------|----------|
 | `lib/supabase/database.types.ts` | 타입 재생성 (categories 추가, company_id 제거) |
 | `lib/actions/tasks.ts` | company JOIN 제거, category 필터 추가 |
 | `lib/actions/dashboard.ts` | 업체별 차트 집계 제거, 이번 주 통계 추가 |
-| `components/dashboard/sidebar-nav.tsx` | 업체 메뉴 제거, 설정 메뉴 추가 |
+| `components/dashboard/sidebar-nav.tsx` | 업체 메뉴 제거, 설정 메뉴 추가, 거래처 메뉴 추가 (Phase 6) |
+| `components/dashboard/bottom-nav.tsx` | 거래처 메뉴 추가 (Phase 6) |
 | `components/tasks/task-form-modal.tsx` | 업체/담당자 필드 제거, 카테고리 선택 추가 |
 | `components/tasks/task-card.tsx` | 업체명 제거, 카테고리 뱃지 추가 |
 | `components/calendar/monthly-calendar.tsx` | 업체 필터 → 카테고리 필터 교체 |
